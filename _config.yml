@@ -102,5 +102,5 @@ theme: landscape
 ## Docs: https://hexo.io/docs/one-command-deployment
 deploy:
   type: git
-  repo: https://github.com/exp3n5ive/exp3n5ive.github.io.git
+  repo: git@github.com:exp3n5ive/exp3n5ive.github.io.git
   branch: main  # 或者 master，取决于 GitHub Pages 的分支设置
