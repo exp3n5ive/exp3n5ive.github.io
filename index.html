@@ -411,7 +411,7 @@
         <div class="label text-third-text-color text-sm">Categories</div>
     </a>
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
-        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">3</div>
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">4</div>
         <div class="label text-third-text-color text-sm">Posts</div>
     </a>
 </div>
@@ -451,7 +451,7 @@
         <div class="label text-third-text-color text-sm">Categories</div>
     </a>
     <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
-        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">3</div>
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">4</div>
         <div class="label text-third-text-color text-sm">Posts</div>
     </a>
 </div>
@@ -466,6 +466,71 @@
 			<div class="main-content">
 				<div class="home-content-container">
     <ul class="home-article-list">
+        
+            <li class="home-article-item">
+
+                
+
+                
+
+                
+                <div class="flex flex-col gap-5 px-7 pb-7 pt-7">
+                    <h3 class="home-article-title">
+                        <a href="/2025/09/21/UTF-8%20OverlongEncoding/">
+                            UTF-8 OverlongEncoding
+                        </a>
+                    </h3>
+
+                    <div class="home-article-content markdown-body">
+                        
+                            
+                            背景在 Java 反序列化攻击时 , 流量特征一般有以下几个 :
+
+反序列化魔数 AC ED
+反序列化的类的全限定类名等
+
+以 CC1 链为例 , 可以看到其序列化数据中的类名是可见的 :
+
+那我们只要能让类名不是可见字符就可以一定程度上绕过 waf 了
+
+仅针对流量层面 , 如果目标重写了 resolveClass 的话，我们是无法用下面的办法来绕过的，因为 resolveClass 已经...
+                        
+                    </div>
+
+                    <div class="home-article-meta-info-container">
+    <div class="home-article-meta-info">
+        <span><i class="fa-solid fa-calendars"></i>&nbsp;
+            <span class="home-article-date" data-date="Sun Sep 21 2025 20:24:10 GMT+0800">
+                
+                    2025-09-21 20:24:10
+                
+            </span>
+        </span>
+        
+            <span class="home-article-category">
+                <i class="fa-solid fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/Java-Sec/">Java Sec</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+        
+        
+    </div>
+
+    <a href="/2025/09/21/UTF-8%20OverlongEncoding/">Read more<span class="seo-reader-text">UTF-8 OverlongEncoding</span>&nbsp;<i class="fa-solid fa-angle-right"></i></a>
+</div>
+
+                </div>
+            </li>
         
             <li class="home-article-item">
 
@@ -675,11 +740,11 @@ https://tech.meituan.com/2019/02/14/talk...
                 
                 <p class="post-count space-x-0.5">
                     <span>
-                        3 posts in total
+                        4 posts in total
                     </span>
                     
                         <span>
-                            25k words in total
+                            29.2k words in total
                         </span>
                     
                 </p>
