@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="exp3n5ive">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://example.com/2025/10/26/用友 u8cloud nccloudgatewayservlet 命令注入漏洞/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="也是挺久之前复现的了 , 当时好像是官方先发了通告 , 然后 CT 当天晚上复现的 , 发了公众号 . 漏洞挺简单的 , 当时晚上看了一眼补丁就知道怎么回事了 . 第二天早上写的 POC , 然后在公司发了次公众号 , 也算是没白来实习一趟 POC12345678910111213141516171819202122232425262728293031323334POST &#x2F;servlet&#x2F;NCC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用友 U8Cloud NCCloudGatewayServlet 命令注入漏洞">
+<meta property="og:url" content="http://example.com/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20NCCloudGatewayServlet%20%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E/index.html">
+<meta property="og:site_name" content="exp3n5ive&#39; Blog">
+<meta property="og:description" content="也是挺久之前复现的了 , 当时好像是官方先发了通告 , 然后 CT 当天晚上复现的 , 发了公众号 . 漏洞挺简单的 , 当时晚上看了一眼补丁就知道怎么回事了 . 第二天早上写的 POC , 然后在公司发了次公众号 , 也算是没白来实习一趟 POC12345678910111213141516171819202122232425262728293031323334POST &#x2F;servlet&#x2F;NCC">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/redefine-og.webp">
+<meta property="article:published_time" content="2025-10-26T04:07:32.267Z">
+<meta property="article:modified_time" content="2025-10-26T04:08:24.422Z">
+<meta property="article:author" content="exp3n5ive">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/redefine-og.webp">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/bemd.ico" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/bemd.ico">
+    <meta name="theme-color" content="#9EC4CC">
+    <link rel="shortcut icon" href="/images/bemd.ico">
+    <!--- Page Info-->
+    
+    <title>
+        
+            用友 U8Cloud NCCloudGatewayServlet 命令注入漏洞 | exp3n5ive&#39; Blog
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"example.com","root":"/","language":"en"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":6,"number":false,"expand":true,"init_open":true},"copyright":{"enable":true,"default":"cc_by_nc_sa"},"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#9EC4CC","secondary":"#9EC4CC","default_mode":"dark"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":{"enable":true,"image":"/images/redefine-og.webp","description":null},"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/wallhaven-wqery6-light.webp","dark":"/images/wallhaven-wqery6-dark.webp"},"title":".","subtitle":{"text":[],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":null,"instagram":null,"zhihu":null,"twitter":null,"email":null},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":false,"version":"11.4.1"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"categories":{"path":"/categories/","icon":"fa-solid fa-layer-group"}},"search":{"enable":false,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"YYYY-MM-DD HH:mm:ss","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2022/8/17 11:45:14"};
+    window.lang_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                exp3n5ive&#39; Blog
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    HOME
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-solid fa-layer-group fa-fw"></i>
+                                    CATEGORIES
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                HOME
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                CATEGORIES
+                            </span>
+                            
+                                <i class="fa-solid fa-layer-group fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">0</div>
+        <div class="label text-third-text-color text-sm">Tags</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">5</div>
+        <div class="label text-third-text-color text-sm">Categories</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">7</div>
+        <div class="label text-third-text-color text-sm">Posts</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">用友 U8Cloud NCCloudGatewayServlet 命令注入漏洞</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/bemd.jpeg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">exp3n5ive</span>
+					
+					<span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv1</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2025-10-26 12:07:32</span>
+        <span class="mobile">2025-10-26 12:07:32</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-10-26 12:08:24</span>
+            <span class="mobile">2025-10-26 12:08:24</span>
+            <span class="hover-info">Updated</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">代码审计</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+
+    
+    
+        <span class="article-wordcount article-meta-item">
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>1.9k Words</span>
+        </span>
+    
+    
+        <span class="article-min2read article-meta-item">
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>9 Mins</span>
+        </span>
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<p>也是挺久之前复现的了 , 当时好像是官方先发了通告 , 然后 CT 当天晚上复现的 , 发了公众号 .</p>
+<p>漏洞挺简单的 , 当时晚上看了一眼补丁就知道怎么回事了 . 第二天早上写的 POC , 然后在公司发了次公众号 , 也算是没白来实习一趟</p>
+<h2 id="POC"><a href="#POC" class="headerlink" title="POC"></a>POC</h2><div class="code-container" data-rel="Http"><figure class="iseeu highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/servlet/NCCloudGatewayServlet</span> <span class="meta">HTTP/1.1</span></span><br><span class="line"><span class="attribute">Host</span><span class="punctuation">: </span></span><br><span class="line"><span class="attribute">gatewaytoken</span><span class="punctuation">: </span>TJ6RT-3FVCB-DPYP8-XF7QM-96FV3</span><br><span class="line"><span class="attribute">Content-Type</span><span class="punctuation">: </span>application/json</span><br><span class="line"></span><br><span class="line"><span class="language-xquery">&#123;</span></span><br><span class="line"><span class="language-xquery">  <span class="string">&quot;serviceInfo&quot;</span>: &#123;</span></span><br><span class="line"><span class="language-xquery">    <span class="string">&quot;serviceClassName&quot;</span>: <span class="string">&quot;com.ufida.zior.console.IActionInvokeService&quot;</span>,</span></span><br><span class="line"><span class="language-xquery">    <span class="string">&quot;serviceMethodName&quot;</span>: <span class="string">&quot;exec&quot;</span>,</span></span><br><span class="line"><span class="language-xquery">    <span class="string">&quot;serviceMethodArgInfo&quot;</span>: [</span></span><br><span class="line"><span class="language-xquery">      &#123;</span></span><br><span class="line"><span class="language-xquery">        <span class="string">&quot;argType&quot;</span>: &#123; <span class="string">&quot;body&quot;</span>: <span class="string">&quot;java.lang.String&quot;</span> &#125;,</span></span><br><span class="line"><span class="language-xquery">        <span class="string">&quot;argValue&quot;</span>: &#123; <span class="string">&quot;body&quot;</span>: <span class="string">&quot;nc.bs.pub.util.ProcessFileUtils&quot;</span> &#125;,</span></span><br><span class="line"><span class="language-xquery">        <span class="string">&quot;agg&quot;</span>:<span class="built_in"> false</span>,</span></span><br><span class="line"><span class="language-xquery">        <span class="string">&quot;isArray&quot;</span>:<span class="built_in"> false</span>,</span></span><br><span class="line"><span class="language-xquery">        <span class="string">&quot;isPrimitive&quot;</span>:<span class="built_in"> false</span></span></span><br><span class="line"><span class="language-xquery">      &#125;,</span></span><br><span class="line"><span class="language-xquery">      &#123;</span></span><br><span class="line"><span class="language-xquery">        <span class="string">&quot;argType&quot;</span>: &#123; <span class="string">&quot;body&quot;</span>: <span class="string">&quot;java.lang.String&quot;</span> &#125;,</span></span><br><span class="line"><span class="language-xquery">        <span class="string">&quot;argValue&quot;</span>: &#123; <span class="string">&quot;body&quot;</span>: <span class="string">&quot;openFile&quot;</span> &#125;,</span></span><br><span class="line"><span class="language-xquery">        <span class="string">&quot;agg&quot;</span>:<span class="built_in"> false</span>,</span></span><br><span class="line"><span class="language-xquery">        <span class="string">&quot;isArray&quot;</span>:<span class="built_in"> false</span>,</span></span><br><span class="line"><span class="language-xquery">        <span class="string">&quot;isPrimitive&quot;</span>:<span class="built_in"> false</span></span></span><br><span class="line"><span class="language-xquery">      &#125;,</span></span><br><span class="line"><span class="language-xquery">      &#123;</span></span><br><span class="line"><span class="language-xquery">        <span class="string">&quot;argType&quot;</span>: &#123; <span class="string">&quot;body&quot;</span>: <span class="string">&quot;java.lang.Object&quot;</span> &#125;,</span></span><br><span class="line"><span class="language-xquery">        <span class="string">&quot;argValue&quot;</span>: &#123; <span class="string">&quot;body&quot;</span>: <span class="string">&quot;poc.txt \&quot;</span>|calc\<span class="string">&quot;&quot;</span> &#125;,</span></span><br><span class="line"><span class="language-xquery">        <span class="string">&quot;agg&quot;</span>:<span class="built_in"> false</span>,</span></span><br><span class="line"><span class="language-xquery">        <span class="string">&quot;isArray&quot;</span>:<span class="built_in"> false</span>,</span></span><br><span class="line"><span class="language-xquery">        <span class="string">&quot;isPrimitive&quot;</span>:<span class="built_in"> false</span></span></span><br><span class="line"><span class="language-xquery">      &#125;</span></span><br><span class="line"><span class="language-xquery">    ]</span></span><br><span class="line"><span class="language-xquery">  &#125;</span></span><br><span class="line"><span class="language-xquery">&#125;</span></span><br></pre></td></tr></table></figure></div>
+
+<h2 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h2><p>入口点位于 com.yonyou.nccloud.gateway.adaptor.servlet.ServletForGW#doAction</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20NCCloudGatewayServlet%20%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E/images/1758780313911-81edb30c-ded8-4859-b9a3-d9c69c69f5ef.png"
+                     
+                ></p>
+<h3 id="token-鉴权分析"><a href="#token-鉴权分析" class="headerlink" title="token 鉴权分析"></a>token 鉴权分析</h3><p>跟进 com.yonyou.nccloud.gateway.adapter.GateWayUtil#checkGateWayToken</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20NCCloudGatewayServlet%20%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E/images/1758780420981-97bf82c7-387e-4d1f-bab6-4733ba862f0d.png"
+                     
+                ></p>
+<p>从配置中读取 nccloud.gateway.nctoken 再解密就是 token , 全局搜索 nccloud.gateway.nctoken :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20NCCloudGatewayServlet%20%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E/images/1758780515045-23616037-19b8-469c-b118-d9ab959b5518.png"
+                     
+                ></p>
+<p>定位解密函数 nc.vo.framework.rsa.Encode#decode , 解密结果为 <code>TJ6RT-3FVCB-DPYP8-XF7QM-96FV3</code></p>
+<hr>
+<h3 id="命令注入分析"><a href="#命令注入分析" class="headerlink" title="命令注入分析"></a>命令注入分析</h3><p>跟进 com.yonyou.nccloud.gateway.adaptor.servlet.ServletForGW#callNCService</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20NCCloudGatewayServlet%20%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E/images/1758781127662-a69af176-408f-4e03-b39d-9315ec2aaf67.png"
+                     
+                ></p>
+<p>经过一系列判断之后到达 :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20NCCloudGatewayServlet%20%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E/images/1758781424174-62e76f2a-d719-480b-abba-70a890053d32.png"
+                     
+                ></p>
+<p>根据补丁我们可以知道使用的服务类是 com.ufida.zior.console.ActionInvokeService :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20NCCloudGatewayServlet%20%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E/images/1758781481977-b9b6046b-68c3-4615-b74c-641e0a8e9be9.png"
+                     
+                ></p>
+<p>它的 exec 方法可以反射调用 public 类的 public 的方法 ( 还有一些限制后面会说 ) :</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.ufida.zior.console;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ConcurrentHashMap;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 动作执行器 - 通过反射机制动态调用类的方法</span></span><br><span class="line"><span class="comment"> * 使用缓存提高方法查找性能</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">final</span> <span class="keyword">class</span> <span class="title class_">ActionExecutor</span> &#123;</span><br><span class="line">    <span class="comment">// 缓存方法映射表：key为&quot;类名:方法名&quot;，value为对应的Method对象</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Map&lt;String, Method&gt; map_method = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 执行指定类的指定方法</span></span><br><span class="line"><span class="comment">     * </span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> actionName 类全限定名</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> methodName 方法名</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> paramter 方法参数</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 方法执行结果</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception 如果执行过程中出现异常</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">static</span> Object <span class="title function_">exec</span><span class="params">(String actionName, String methodName, Object paramter)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="comment">// 参数校验</span></span><br><span class="line">        <span class="keyword">if</span> (actionName != <span class="literal">null</span> &amp;&amp; methodName != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 通过反射创建类的实例</span></span><br><span class="line">            <span class="type">Object</span> <span class="variable">action</span> <span class="operator">=</span> Class.forName(actionName).newInstance();</span><br><span class="line">            <span class="type">String</span> <span class="variable">key</span> <span class="operator">=</span> actionName + <span class="string">&quot;:&quot;</span> + methodName;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 从缓存中获取方法</span></span><br><span class="line">            <span class="type">Method</span> <span class="variable">m</span> <span class="operator">=</span> (Method)map_method.get(key);</span><br><span class="line">            <span class="keyword">if</span> (m == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="comment">// 缓存未命中，通过反射查找方法</span></span><br><span class="line">                Class&lt;? <span class="keyword">extends</span> <span class="title class_">Object</span>&gt; actionclz = action.getClass();</span><br><span class="line"></span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="comment">// 首先尝试精确匹配参数类型为Object的方法</span></span><br><span class="line">                    m = actionclz.getMethod(methodName, Object.class);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (NoSuchMethodException var13) &#123;</span><br><span class="line">                    <span class="comment">// 精确匹配失败，遍历所有方法按方法名匹配</span></span><br><span class="line">                    Method[] mthds = actionclz.getMethods();</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">for</span>(Method mthd : mthds) &#123;</span><br><span class="line">                        <span class="keyword">if</span> (methodName.equals(mthd.getName())) &#123;</span><br><span class="line">                            m = mthd;</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// 将找到的方法放入缓存</span></span><br><span class="line">                <span class="keyword">if</span> (m != <span class="literal">null</span>) &#123;</span><br><span class="line">                    map_method.put(key, m);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 方法不存在时抛出异常</span></span><br><span class="line">            <span class="keyword">if</span> (m == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;Mthod &quot;</span> + methodName + <span class="string">&quot; not exists.&quot;</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="type">Object</span> <span class="variable">result</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">                <span class="comment">// 获取方法的参数类型</span></span><br><span class="line">                Class&lt;? <span class="keyword">extends</span> <span class="title class_">Object</span>&gt;[] types = m.getParameterTypes();</span><br><span class="line">                </span><br><span class="line">                <span class="comment">// 根据参数情况调用方法</span></span><br><span class="line">                <span class="keyword">if</span> (types != <span class="literal">null</span> &amp;&amp; types.length &gt;= <span class="number">1</span>) &#123;</span><br><span class="line">                    <span class="comment">// 方法有参数时直接传入参数调用</span></span><br><span class="line">                    <span class="keyword">if</span> (types.length == <span class="number">1</span>) &#123;</span><br><span class="line">                        <span class="comment">// 单参数方法的特殊处理（但实际逻辑与多参数情况相同）</span></span><br><span class="line">                        <span class="keyword">if</span> (paramter != <span class="literal">null</span> &amp;&amp; paramter.getClass().isArray()) &#123;</span><br><span class="line">                            result = m.invoke(action, paramter);</span><br><span class="line">                        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                            result = m.invoke(action, paramter);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        <span class="comment">// 多参数方法调用 , 实际好像会报错</span></span><br><span class="line">                        result = m.invoke(action, paramter);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="comment">// 无参数方法调用</span></span><br><span class="line">                    result = m.invoke(action);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">return</span> result;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>根据补丁我们也能定位到 sink 点为 nc.bs.pub.util.ProcessFileUtils#openFile(java.lang.String)</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20NCCloudGatewayServlet%20%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E/images/1758781813271-5aef2d26-5b85-4240-bc2b-fcf09e29b416.png"
+                     
+                ></p>
+<p>这里存在命令注入漏洞</p>
+<h2 id="补丁分析"><a href="#补丁分析" class="headerlink" title="补丁分析"></a>补丁分析</h2><p>首先下载官方补丁 : </p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://security.yonyou.com/#/patchInfo?identifier=9695976d67dd4786badf91df6cb6578c" >https://security.yonyou.com/#/patchInfo?identifier=9695976d67dd4786badf91df6cb6578c<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+<p>补丁是对类进行了替换 :</p>
+<div class="code-container" data-rel="Xml"><figure class="iseeu highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;UTF-8&quot;</span>?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">installpatch</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">copy</span>&gt;</span><span class="tag">&lt;<span class="name">from</span>&gt;</span>/replacement/modules/<span class="tag">&lt;/<span class="name">from</span>&gt;</span><span class="tag">&lt;<span class="name">to</span>&gt;</span>/modules/<span class="tag">&lt;/<span class="name">to</span>&gt;</span><span class="tag">&lt;/<span class="name">copy</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">installpatch</span>&gt;</span></span><br></pre></td></tr></table></figure></div>
+
+<div class="code-container" data-rel="Xml"><figure class="iseeu highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">│  installpatch.xml</span><br><span class="line">│  packmetadata.xml</span><br><span class="line">│  readme.txt</span><br><span class="line">│</span><br><span class="line">└─replacement</span><br><span class="line">    └─modules</span><br><span class="line">        └─uapbd</span><br><span class="line">            ├─classes</span><br><span class="line">            │  └─com</span><br><span class="line">            │      └─yonyou</span><br><span class="line">            │          └─nccloud</span><br><span class="line">            │              └─gateway</span><br><span class="line">            │                  └─adapter</span><br><span class="line">            │                      │  GateWayUtil.class</span><br><span class="line">            │                      │</span><br><span class="line">            │                      └─util</span><br><span class="line">            │                              GWWhiteCtrlUtil.class</span><br><span class="line">            │</span><br><span class="line">            └─META-INF</span><br><span class="line">                └─classes</span><br><span class="line">                    └─com</span><br><span class="line">                        └─yonyou</span><br><span class="line">                            └─nccloud</span><br><span class="line">                                └─gateway</span><br><span class="line">                                    └─adaptor</span><br><span class="line">                                        └─servlet</span><br><span class="line">                                                ServletForGW.class</span><br></pre></td></tr></table></figure></div>
+
+<h3 id="ServletForGW"><a href="#ServletForGW" class="headerlink" title="ServletForGW"></a>ServletForGW</h3><h4 id="doAction"><a href="#doAction" class="headerlink" title="doAction"></a>doAction</h4><p>第一处是 com.yonyou.nccloud.gateway.adaptor.servlet.ServletForGW#doAction 中增强了 token 验证逻辑 :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20NCCloudGatewayServlet%20%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E/images/1758767815722-ef673ef7-024e-471a-aa54-a4f026c2ad9b.png"
+                     
+                ></p>
+<p>修复前 :</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GateWayUtil.checkGateWayToken(request.getHeader(<span class="string">&quot;gatewaytoken&quot;</span>));</span><br></pre></td></tr></table></figure></div>
+
+<p>修复后 :</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GateWayUtil.checkGateWayTokenNew((String)request.getHeader(<span class="string">&quot;ts&quot;</span>), (String)request.getHeader(<span class="string">&quot;sign&quot;</span>));</span><br></pre></td></tr></table></figure></div>
+
+<p>使用了新的方法进行校验 , 具体实现后面讲</p>
+<hr>
+<h4 id="callNCService"><a href="#callNCService" class="headerlink" title="callNCService"></a>callNCService</h4><p>第二处是 com.yonyou.nccloud.gateway.adaptor.servlet.ServletForGW#callNCService :</p>
+<p>在反射调用指定服务类的方法时会检查 serviceClassName 以及 argValues , 具体实现在下面讲</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20NCCloudGatewayServlet%20%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E6%BC%8F%E6%B4%9E/images/1758768218762-2c2e34d1-01b7-44c5-a292-c387b920ca63.png"
+                     
+                ></p>
+<hr>
+<h3 id="GateWayUtil"><a href="#GateWayUtil" class="headerlink" title="GateWayUtil"></a>GateWayUtil</h3><h4 id="checkGateWayTokenNew"><a href="#checkGateWayTokenNew" class="headerlink" title="checkGateWayTokenNew"></a>checkGateWayTokenNew</h4><p>第一处是新增了 checkGateWayTokenNew 方法 :</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">checkGateWayTokenNew</span><span class="params">(String ts, String sign)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="keyword">if</span> (StringUtils.isEmpty((String)ts) || StringUtils.isEmpty((String)sign)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Exception</span>(<span class="string">&quot;\u60a8\u6ca1\u6709\u8bf7\u6c42\u8be5\u670d\u52a1\u7684\u6743\u9650\uff0c\u8bf7\u91cd\u542f\u7f51\u5173&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="type">long</span> <span class="variable">tsLong</span> <span class="operator">=</span> <span class="number">0L</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            tsLong = Long.parseLong(ts);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Exception</span>(<span class="string">&quot;\u60a8\u6ca1\u6709\u8bf7\u6c42\u8be5\u670d\u52a1\u7684\u6743\u9650\uff0cts\u53c2\u6570\u5f02\u5e38&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (Math.abs(System.currentTimeMillis() - tsLong) &gt; <span class="number">180000L</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Exception</span>(<span class="string">&quot;\u60a8\u6ca1\u6709\u8bf7\u6c42\u8be5\u670d\u52a1\u7684\u6743\u9650\uff0c\u53c2\u6570\u5df2\u8fc7\u671f&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (!StringUtils.equals((String)sign, (String)GateWayUtil.sign(ts))) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">Exception</span>(<span class="string">&quot;\u60a8\u6ca1\u6709\u8bf7\u6c42\u8be5\u670d\u52a1\u7684\u6743\u9650\uff0csign\u9a8c\u7b7e\u5931\u8d25&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>增加了时间戳验证 , 防重放攻击 , 但是实际上没有用 , 因为最终使用的还是配置里的默认密钥</p>
+<p>( 这里要跟进 <code>sign</code> 方法才能看到 , 我忘记贴了 )</p>
+<hr>
+<h3 id="GWWhiteCtrlUtil"><a href="#GWWhiteCtrlUtil" class="headerlink" title="GWWhiteCtrlUtil"></a>GWWhiteCtrlUtil</h3><h4 id="checkAuthority"><a href="#checkAuthority" class="headerlink" title="checkAuthority"></a>checkAuthority</h4><p>第二处是 GWWhiteCtrlUtil 的 checkAuthority 方法 , 这是个新增的类</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.yonyou.nccloud.gateway.adapter.util;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ConcurrentHashMap;</span><br><span class="line"><span class="keyword">import</span> nc.bs.framework.common.RuntimeEnv;</span><br><span class="line"><span class="keyword">import</span> nc.bs.logging.Logger;</span><br><span class="line"><span class="keyword">import</span> nc.vo.bd.pub.BDCacheMiscUtil;</span><br><span class="line"><span class="keyword">import</span> nc.vo.pub.BusinessException;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">GWWhiteCtrlUtil</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">String</span> <span class="variable">SQLVIEW</span> <span class="operator">=</span> <span class="string">&quot;SQLVIEW&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">String</span> <span class="variable">ITFMAP</span> <span class="operator">=</span> <span class="string">&quot;ITFMAP&quot;</span>;</span><br><span class="line">    <span class="keyword">private</span> Map&lt;String, Object&gt; cache;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String[] BannedSqlWord = <span class="keyword">new</span> <span class="title class_">String</span>[]&#123;<span class="string">&quot;drop&quot;</span>, <span class="string">&quot;delete&quot;</span>, <span class="string">&quot;update&quot;</span>, <span class="string">&quot;insert&quot;</span>, <span class="string">&quot;exec&quot;</span>, <span class="string">&quot;execute&quot;</span>, <span class="string">&quot;create&quot;</span>, <span class="string">&quot;alter&quot;</span>&#125;;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Map&lt;String, GWWhiteCtrlUtil&gt; dsName_instance_map = <span class="keyword">new</span> <span class="title class_">ConcurrentHashMap</span>&lt;String, GWWhiteCtrlUtil&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">/*</span></span><br><span class="line"><span class="comment">     * WARNING - Removed try catching itself - possible behaviour change.</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> GWWhiteCtrlUtil <span class="title function_">getInstance</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">dsName</span> <span class="operator">=</span> BDCacheMiscUtil.getCurrentDatasourceName();</span><br><span class="line">        <span class="type">GWWhiteCtrlUtil</span> <span class="variable">instance</span> <span class="operator">=</span> dsName_instance_map.get(dsName);</span><br><span class="line">        Map&lt;String, GWWhiteCtrlUtil&gt; map = dsName_instance_map;</span><br><span class="line">        <span class="keyword">synchronized</span> (map) &#123;</span><br><span class="line">            instance = dsName_instance_map.get(dsName);</span><br><span class="line">            <span class="keyword">if</span> (instance == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="keyword">if</span> (!RuntimeEnv.getInstance().isRunningInServer()) &#123;</span><br><span class="line">                    dsName_instance_map.clear();</span><br><span class="line">                &#125;</span><br><span class="line">                instance = <span class="keyword">new</span> <span class="title class_">GWWhiteCtrlUtil</span>();</span><br><span class="line">                dsName_instance_map.put(dsName, instance);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">checkAuthority</span><span class="params">(String serviceClassName, Object[] argValues)</span> <span class="keyword">throws</span> BusinessException &#123;</span><br><span class="line">        <span class="built_in">this</span>.checkSQLQuery(serviceClassName, argValues);</span><br><span class="line">        <span class="built_in">this</span>.checkITFAuthority(serviceClassName, argValues);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">checkSQLQuery</span><span class="params">(String serviceClassName, Object[] argValues)</span> <span class="keyword">throws</span> BusinessException &#123;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">checkITFAuthority</span><span class="params">(String serviceClassName, Object[] argValues)</span> <span class="keyword">throws</span> BusinessException &#123;</span><br><span class="line">        <span class="built_in">this</span>.checkBlackITFAuthority(serviceClassName, argValues);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">checkBlackITFAuthority</span><span class="params">(String serviceClassName, Object[] argValues)</span> <span class="keyword">throws</span> BusinessException &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">&quot;com.ufida.zior.console.IActionInvokeService&quot;</span>.equalsIgnoreCase(serviceClassName) &amp;&amp; <span class="string">&quot;nc.bs.pub.util.ProcessFileUtils&quot;</span>.equalsIgnoreCase(String.valueOf(argValues[<span class="number">0</span>]))) &#123;</span><br><span class="line">            Logger.error((Object)<span class="string">&quot;\u76ee\u524d\u6ca1\u6709\u67e5\u3010nc.bs.pub.util.ProcessFileUtils\u3011\u63a5\u53e3\u6743\u9650&quot;</span>);</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;\u76ee\u524d\u6ca1\u67e5\u8be2\u3010nc.bs.pub.util.ProcessFileUtils\u3011\u63a5\u53e3\u6743\u9650&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">&quot;nc.itf.uap.IUAPQueryBS&quot;</span>.equalsIgnoreCase(serviceClassName)) &#123;</span><br><span class="line">            <span class="type">String</span> <span class="variable">argSql</span> <span class="operator">=</span> ((String)argValues[<span class="number">0</span>]).toLowerCase();</span><br><span class="line">            String[] stringArray = BannedSqlWord;</span><br><span class="line">            <span class="type">int</span> <span class="variable">n</span> <span class="operator">=</span> BannedSqlWord.length;</span><br><span class="line">            <span class="type">int</span> <span class="variable">n2</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">            <span class="keyword">while</span> (n2 &lt; n) &#123;</span><br><span class="line">                <span class="type">String</span> <span class="variable">word</span> <span class="operator">=</span> stringArray[n2];</span><br><span class="line">                <span class="keyword">if</span> (argSql.contains(word)) &#123;</span><br><span class="line">                    Logger.error((Object)(<span class="string">&quot;SQL\u8bed\u53e5\u4e2d\u5b58\u5728\u654f\u611f\u8bcd:&quot;</span> + word));</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;SQL\u8bed\u53e5\u4e2d\u5b58\u5728\u654f\u611f\u8bcd:&quot;</span> + word);</span><br><span class="line">                &#125;</span><br><span class="line">                ++n2;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<p>在 checkBlackITFAuthority 中检测了我们的 serviceClassName 是否为 com.ufida.zior.console.IActionInvokeService , 并且 argValues[0] 是否为 nc.bs.pub.util.ProcessFileUtils</p>
+<p>如果满足就会抛出异常</p>
+<p>可以看出官方这里修的很随意 , 居然只是使用了简单的黑名单禁用了 <code>ProcessFileUtils</code> 这个类</p>
+<p>所以 IActionInvokeService 中的方法调用还是在的 , 只要能再找到一个</p>
+<p>调用的类必须有** public 的无参构造方法**</p>
+<p>调用的方法是 <strong>public</strong> 的</p>
+<p>调用的方法是<strong>无参</strong>或<strong>单参</strong>且为<strong>基本类型 , 如果多参数必须是 String&#x2F;String[]</strong></p>
+<p>的危险方法 , 应该就可以利用</p>
+<p>笔者后面和朋友一起找到了很多新的 Sink 点 , 可惜提交到了 CNVD 没被收</p>
+<p>很久没关注这个产品了 , 不知道官方有没有进一步修复这个漏洞</p>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>Title:</strong> 用友 U8Cloud NCCloudGatewayServlet 命令注入漏洞</li>
+        <li><strong>Author:</strong> exp3n5ive</li>
+        <li><strong>Created at
+                :</strong> 2025-10-26 12:07:32</li>
+        
+            <li>
+                <strong>Updated at
+                    :</strong> 2025-10-26 12:08:24
+            </li>
+        
+        <li>
+            <strong>Link:</strong> https://exp3n5ive.github.io/2025/10/26/用友 U8Cloud NCCloudGatewayServlet 命令注入漏洞/
+        </li>
+        <li>
+            <strong>
+                License:
+            </strong>
+            
+
+            
+                This work is licensed under <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a>.
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">用友 U8Cloud IPFxxFileService 文件上传漏洞分析</span>
+						<span class="post-nav-item">Next posts</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        Comments
+    </div>
+    
+
+        
+            
+    <div id="waline"></div>
+    <script type="module" data-swup-reload-script>
+      import { init } from '/js/libs/waline.mjs';
+
+      function loadWaline() {
+        init({
+          el: '#waline',
+          serverURL: 'https://example.example.com',
+          dark: 'body[class~="dark-mode"]',
+          reaction: false,
+          requiredMeta: ['nick', 'mail'],
+          emoji: [],
+                    lang: 'zh-CN',
+        });
+      }
+
+      if (typeof swup !== 'undefined') {
+        loadWaline();
+      } else {
+        window.addEventListener('DOMContentLoaded', loadWaline);
+      }
+    </script>
+
+
+
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">On this page</div>
+		<div class="page-title">用友 U8Cloud NCCloudGatewayServlet 命令注入漏洞</div>
+		<ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#POC"><span class="nav-text">POC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90"><span class="nav-text">漏洞分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#token-%E9%89%B4%E6%9D%83%E5%88%86%E6%9E%90"><span class="nav-text">token 鉴权分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%BD%E4%BB%A4%E6%B3%A8%E5%85%A5%E5%88%86%E6%9E%90"><span class="nav-text">命令注入分析</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%A5%E4%B8%81%E5%88%86%E6%9E%90"><span class="nav-text">补丁分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ServletForGW"><span class="nav-text">ServletForGW</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#doAction"><span class="nav-text">doAction</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#callNCService"><span class="nav-text">callNCService</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GateWayUtil"><span class="nav-text">GateWayUtil</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#checkGateWayTokenNew"><span class="nav-text">checkGateWayTokenNew</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GWWhiteCtrlUtil"><span class="nav-text">GWWhiteCtrlUtil</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#checkAuthority"><span class="nav-text">checkAuthority</span></a></li></ol></li></ol></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2022</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-chisel fa-regular fa-calendar"></i>&nbsp;&nbsp;<a href="/">exp3n5ive</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        7 posts in total
+                    </span>
+                    
+                        <span>
+                            35.7k words in total
+                        </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">VISITOR COUNT</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">TOTAL PAGE VIEWS</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">POWERED BY <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a></span>
+            <span class="text-sm lg:block">THEME&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                Blog up for <span class="odometer" id="runtime_days" ></span> days <span class="odometer" id="runtime_hours"></span> hrs <span class="odometer" id="runtime_minutes"></span> Min <span class="odometer" id="runtime_seconds"></span> Sec
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="arrow-up fas fa-arrow-up"></i>
+			<span class="percent"></span>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>
